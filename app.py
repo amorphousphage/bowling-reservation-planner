@@ -5,7 +5,7 @@ import numpy as np
 from datetime import datetime, timedelta
 
 app = Flask(__name__, template_folder='templates')  # Set the template folder
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:4493abcd@localhost/bowlingreservation'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:password@localhost/bowlingreservation'
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
@@ -154,7 +154,7 @@ def home():
 @app.before_request
 def check_auth():
     auth = request.authorization
-    if not auth or not (auth.username == 'GoEasy Bowling' and auth.password == 'goebrp'):
+    if not auth or not (auth.username == 'username' and auth.password == 'password'):
         return authenticate()
         
 def authenticate():
