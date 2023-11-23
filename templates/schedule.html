@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="refresh" content="20">
+
+    <title>{{ translations_de.get("Bowling Lane Schedule") }}</title>
+
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+	
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/i18n/jquery-ui-i18n.min.js"></script>
+	
+	<link rel="stylesheet" href="../static/styles.css">
+</head>
+<body>
+	
+<h1>{{ translations_de.get("Bowling Lane Schedule for ") }}{{ translated_day }}, {{ requested_date.strftime('%d. ') }}{{ translated_month }} {{ requested_date.strftime('%Y') }}</h1>
+
+    
+<form class="inlineform" action="{{ url_for('display_schedule', date=prev_date) }}">
+	<button class="datebuttons">&lt;&lt;&lt;</button>
+</form>
+
+<form class="inlineform" action="/">
+   	<button class="datebuttons">{{ translations_de.get("Today") }}</button>
+</form>
+
+<form class="inlineform" action="{{ url_for('display_schedule', date=next_date) }}">
+	<button class="datebuttons">&gt;&gt;&gt;</button>
+</form>
+
+<form class="inlineform" action="{{ url_for('display_schedule') }}" method="GET">
+    <label for="datepicker" class="calendar-icon">
+        <i class="fas fa-calendar-alt" onclick="$('#datepicker').datepicker('show');"></i>
+    </label>
+    <input type="text" id="datepicker" name="selected_date">
+    <button class="datebuttons">{{ translations_de.get("Show Reservations") }}</button>
+</form>
+<br>
+<form class = "inlineform" action="{{ url_for('add_data') }}">
+	<button class="addupdatereservationbutton">{{ translations_de.get("Add Reservation") }}</button>
+</form>
+<br><br>
+    <table>
+        <tr>
+            <th></th>
+            {% for time_slot in time_slots %}
+                <th>{{ "%02d:%02d" % ((time_slot // 60) % 24, time_slot % 60) }}</th>
+            {% endfor %}
+        </tr>
+        {% for lane in range(num_lanes) %}
+            <tr data-lane="{{ lane + 1}}">
+				<td><div>
+					<strong>{{ translations_de.get("Lane") }} {{ lane + 1 }}</strong><br>
+					<label class="ok-label">
+						<input type="radio" id="lane_status_{{ lane + 1 }}_ok" name="lane_status_{{ lane + 1 }}" value="ok" {% if not lane_defective_states[lane] %}checked{% endif %}> {{ translations_de.get("OK") }}
+					</label>
+					<label class="defective-label">
+						<input type="radio" id="lane_status_{{ lane + 1 }}_defective" name="lane_status_{{ lane + 1 }}" value="defective" {% if lane_defective_states[lane] %}checked{% endif %}> {{ translations_de.get("Defective") }}
+					</label>
+				</div></td>
+                {% for time_slot in time_slots %}
+                    {% if lane_reservations[lane][time_slot] %}
+                        {% if lane_reservations[lane][time_slot] != 'occupied' %}
+                            <td colspan={{ lane_reservations[lane][time_slot]['duration_slots'] }} class="reservation">
+								<a href="/update_data?id={{ lane_reservations[lane][time_slot]['id'] }}">
+                                {{ lane_reservations[lane][time_slot]['name'] }}<br>
+                                {% if lane_reservations[lane][time_slot]['players'] %}
+									{{ lane_reservations[lane][time_slot]['players'] }} {{ translations_de.get("players") }}
+								{% endif %}
+                                {% if lane_reservations[lane][time_slot]['kids'] == 1 %}
+									{{ translations_de.get("with kids") }} <br>
+								{% endif %}
+								{% if lane_reservations[lane][time_slot]['specialevent'] != "No" %}
+									{{ lane_reservations[lane][time_slot]['specialevent'] }}
+								{% endif %}
+                            </td>
+                        {% elif lane_reservations[lane][time_slot] == 'occupied'%}
+                        {% else %}
+                            <td></td>
+                        {% endif %}
+                    {% else %}
+                        <td></td>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+    
+<script>
+    $(function() {
+		$.datepicker.setDefaults($.datepicker.regional['de']);
+        $("#datepicker").datepicker({
+            dateFormat: 'yy-mm-dd', // Format the date as needed
+            changeMonth: true,
+            changeYear: true,
+            // Additional options can be added based on your preferences
+        });
+    });
+</script>
+    
+<script>
+    // JavaScript for radio button event listeners
+    const defectiveRadioButtons = document.querySelectorAll('input[value="defective"]');
+    defectiveRadioButtons.forEach(button => {
+        button.addEventListener('change', function () {
+            const row = this.closest('tr');
+            const laneNumber = row.dataset.lane; // Get lane number from the row's data attribute
+
+            if (this.checked) {
+                row.classList.add('defective-row');
+                updateDefectiveState(laneNumber, true);
+            } else {
+                row.classList.remove('defective-row');
+                updateDefectiveState(laneNumber, false);
+            }
+        });
+    });
+
+    const okRadioButtons = document.querySelectorAll('input[value="ok"]');
+    okRadioButtons.forEach(button => {
+        button.addEventListener('change', function () {
+            const row = this.closest('tr');
+            const laneNumber = row.dataset.lane; // Get lane number from the row's data attribute
+
+            if (this.checked) {
+                row.classList.remove('defective-row');
+                updateDefectiveState(laneNumber, false);
+            }
+        });
+    });
+
+    // Additional script to apply formatting on page load
+    document.addEventListener('DOMContentLoaded', function () {
+        defectiveRadioButtons.forEach(button => {
+            const row = button.closest('tr');
+            if (button.checked) {
+                row.classList.add('defective-row');
+            }
+        });
+    });
+
+    // Function to send AJAX request to update defective state
+    function updateDefectiveState(laneNumber, isDefective) {
+        $.ajax({
+            type: 'POST',
+            url: '/update_defective_state',
+            data: { laneNumber: laneNumber, isDefective: isDefective.toString() },
+            success: function (response) {
+                console.log(response); // Log the server response (optional)
+            },
+            error: function (error) {
+                console.error('Error updating defective state:', error);
+            }
+        });
+    }
+</script>
+<script>
+  var time_slots = {{ time_slots_str }};
+  var headerRow = document.querySelector('tr:nth-child(1)'); // Select the first row (header row)
+  var currentTime = new Date();
+  var currentHour = currentTime.getHours();
+  var currentMinute = currentTime.getMinutes();
+  var currentTimeSlot = (currentHour * 60) + currentMinute;
+  var requestedDate = new Date("{{ requested_date.strftime('%Y-%m-%d') }}");
+
+  if (currentTime.toDateString() === requestedDate.toDateString()) {
+    time_slots.forEach(function(timeSlot, index) {
+      var nextTimeSlot = time_slots[index + 1] || time_slots[index] + 30; // Get the next time slot or add 30 minutes
+
+      if (currentTimeSlot >= timeSlot && currentTimeSlot < nextTimeSlot) {
+        var headerCell = headerRow.querySelectorAll('th')[index + 1]; // Get the corresponding header cell
+
+        if (headerCell) {
+          headerCell.style.backgroundColor = 'red'; // Highlight the header cell
+          headerCell.style.color = 'white'; // Adjust text color for better visibility
+        }
+      }
+    });
+  }
+</script>
+</body>
+</html>

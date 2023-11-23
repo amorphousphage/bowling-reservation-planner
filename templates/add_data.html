@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ translations_de.get("Add Bowling Data") }}</title>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	<link rel="stylesheet" href="../static/styles.css">
+</head>
+<body class="add-data">
+    <h1>{{ translations_de.get("Add Bowling Data") }}</h1>
+    <form class="inlineform" method="POST" action="/submit_data">
+        <label for="date">{{ translations_de.get("Date") }}:</label>
+        <input type="text" id="date" name="date" value="{{ today }}" required>
+        <script>
+			$(function() {
+				$("#date").datepicker({
+					dateFormat: 'dd-M-yy', // Format the date as needed
+					changeMonth: true,
+					changeYear: true,
+					// Additional options can be added based on your preferences
+				});
+			});
+		</script>
+        
+        <br><br>
+
+        <label for="name">{{ translations_de.get("Name") }}:</label>
+        <input type="text" id="name" name="name" required><br><br>
+
+        <label for="start_time">{{ translations_de.get("Start Time") }} (HH:MM):</label>
+        <input type="text" id="start_time" name="start_time" required><br><br>
+
+        <script>
+            // Format start time as HH:MM while typing
+            $(function() {
+                $('#start_time').on('input', function() {
+                    var val = $(this).val();
+                    var formatted = val.replace(/(\d{2})(\d{2})/, '$1:$2');
+                    $(this).val(formatted);
+                });
+            });
+        </script>
+
+        <label for="duration">{{ translations_de.get("duration (hours)") }}:</label>
+        <input type="number" step="0.5" id="duration" name="duration" required><br><br>
+
+        <label for="players">{{ translations_de.get("Number of Players") }}:</label>
+        <input type="number" id="players" name="players"><br><br>
+        
+        <label for="kids">{{ translations_de.get("Kids Playing?") }}</label>
+        <input type="checkbox" id="kids" name="kids" value="1"><br><br>
+
+        <label for="lanes">{{ translations_de.get("Select Lane Number(s)") }}:</label><br>
+        {% for lane in lanes %}
+            <input type="checkbox" id="lane_{{ lane }}" name="lanes[]" value="{{ lane }}">
+            <label for="lane_{{ lane }}">{{ translations_de.get("Lane") }} {{ lane }}</label><br>
+        {% endfor %}
+        <br>
+        
+        <label for="special_event">{{ translations_de.get("Special Event") }}:</label>
+        <select id="special_event" name="special_event">
+            <option value="No" selected>{{translations_de.get("No")}}</option>
+            <option value="{{ translations_de.get("Kid Birthday Variant 1") }}">{{ translations_de.get("Kid Birthday Variant 1") }}</option>
+            <option value="{{ translations_de.get("Kid Birthday Variant 2") }}">{{ translations_de.get("Kid Birthday Variant 2") }}</option>
+        </select><br><br>
+		<button class="addupdatereservationbutton" onclick="addReservation()">{{ translations_de.get("Save New Reservation") }}</button>
+		<button class="backbutton" onclick="goBack(event)">{{ translations_de.get("Back") }}</button>
+    </form>
+    <script>
+     function addReservation() {
+        document.getElementById('formAction').value = 'Update';
+        document.getElementById('reservationForm').submit();
+        }
+    function goBack(event) {
+		event.preventDefault();
+		window.history.back();
+		}
+	window.onbeforeunload = function() {
+    // Clear form data or reset the form fields here
+    document.getElementById('reservationForm').reset();
+	}
+	</script>
+</body>
+</html>

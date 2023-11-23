@@ -1,0 +1,224 @@
+
+table {
+    border-collapse: collapse;
+    overflow-x: scroll;
+}
+
+		a:link,
+		a:visited {
+			color: inherit; /* or specify your desired color */
+			text-decoration: none; /* or specify the decoration you prefer */
+		}
+
+td, th {
+    border: 1px solid black;
+    padding: 8px;
+}
+
+th {
+    background-color: #0087ff;
+}
+
+td {
+    text-align: center;
+    vertical-align: middle;
+}
+		td div {
+			width: 200px; overflow: hidden;
+		}
+		
+td.reservation {
+    background-color: #00008f;
+    color: white;
+}
+
+.defective-label {
+    color: red;
+}
+
+.ok-label {
+    color: green;
+}
+
+.defective-row td:not(:first-child) {
+    background: repeating-linear-gradient(
+45deg,
+transparent,
+transparent 10px,
+black 13px
+    );
+    color: red;
+    font-weight: bold;
+}
+
+.inlineform {
+	display: inline-block;
+}
+
+body {
+	background-image: url("../static/images/bg.png");
+	background-size: cover;
+}
+@media (orientation: portrait) {
+.datebuttons {
+	margin-bottom: 20px;
+	background-color: #0087ff;
+	padding: 35px 40px;
+	font-size: 40px;
+	text-align: center;
+	text-decoration: none;
+	outline: none;
+	border: none;
+	border-radius: 40px;
+}
+		
+.backbutton {
+	background-color: #0087ff;
+	padding: 40px 50px;
+	font-size: 40px;
+	text-align: center;
+	text-decoration: none;
+	outline: none;
+	border: none;
+	border-radius: 40px;
+}
+		
+.addupdatereservationbutton {
+	background-color: #04AA6D;
+	padding: 50px 60px;
+	font-size: 45px;
+	text-align: center;
+	text-decoration: none;
+	outline: none;
+	color: #fff;
+	border: none;
+	border-radius: 170px;
+}
+
+.deletereservationbutton {
+	background-color: #ff3838;
+	padding: 50px 60px;
+	font-size: 40px;
+	text-align: center;
+	text-decoration: none;
+	outline: none;
+	color: #fff;
+	border: none;
+	border-radius: 170px;
+}
+
+.calendar-icon i {
+	font-size: 80px;
+	margin-left: 80px;
+	position: relative;
+	top: 20px;
+}
+
+
+	body.add-data,
+	body.update-data {
+
+		font-size: 35px;
+	}
+
+	body.add-data input,
+	body.update-data input {
+		font-size: 35px;
+	}
+
+	input[type="checkbox"] {
+		width: 50px;
+		height: 50px;
+	}
+
+	select {
+		font-size: 35px;
+		padding: 10px;
+	}
+
+	select option {
+		font-size: 35px;
+	}
+}
+
+@media (orientation:landscape) {
+
+.datebuttons {
+	margin-bottom: 20px;
+	background-color: #0087ff;
+	padding: 15px 20px;
+	font-size: 20px;
+	text-align: center;
+	text-decoration: none;
+	outline: none;
+	border: none;
+	border-radius: 20px;
+}
+		
+.backbutton {
+	background-color: #0087ff;
+	padding: 20px 30px;
+	font-size: 20px;
+	text-align: center;
+	text-decoration: none;
+	outline: none;
+	border: none;
+	border-radius: 20px;
+}
+		
+.addupdatereservationbutton {
+	background-color: #04AA6D;
+	padding: 20px 30px;
+	font-size: 20px;
+	text-align: center;
+	text-decoration: none;
+	outline: none;
+	color: #fff;
+	border: none;
+	border-radius: 150px;
+}
+
+.deletereservationbutton {
+	background-color: #ff3838;
+	padding: 20px 30px;
+	font-size: 20px;
+	text-align: center;
+	text-decoration: none;
+	outline: none;
+	color: #fff;
+	border: none;
+	border-radius: 150px;
+}
+
+.calendar-icon i {
+	font-size: 50px;
+	margin-left: 50px;
+	position: relative;
+	top: 10px;
+}
+body.add-data,
+body.update-data {
+
+font-size: 18px;
+}
+
+body.add-data input,
+body.update-data input {
+font-size: 18px;
+}
+
+input[type="checkbox"] {
+width: 25px;
+height: 25px;
+}
+
+select {
+font-size: 18px;
+padding: 8px;
+}
+
+select option {
+font-size: 18px;
+}
+
+}

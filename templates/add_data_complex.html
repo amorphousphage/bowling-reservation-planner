@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Bowling Data</title>
+</head>
+<body>
+    <h1>Add Bowling Data</h1>
+    <form method="POST" action="/submit_data" id="bowling-form">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required><br><br>
+
+        <label for="start_time">Start Time (HH:MM):</label>
+        <input type="text" id="start_time" name="start_time" required><br><br>
+
+        <label for="duration">Duration (hours):</label>
+        <input type="number" step="0.5" id="duration" name="duration" required><br><br>
+
+        <label for="players">Number of Players:</label>
+        <input type="number" id="players" name="players" required><br><br>
+
+        <label for="numberoflanes">Number of lanes:</label>
+        <select name="numberoflanes" id="numberoflanes" required>
+            {% for lane in lanes %}
+                <option value="{{ lane }}">{{ lane }}</option>
+            {% endfor %}
+        </select>
+        
+		<br>
+        <p style="margin-left:25px;">
+        <div id="laneNumbersContainer"></div>
+		</p>
+		
+        <input type="submit" value="Submit">
+    
+    </form>
+
+    <script>
+        document.getElementById('numberoflanes').addEventListener('change', function () {
+            const numberoflanes = parseInt(this.value);
+            const container = document.getElementById('laneNumbersContainer');
+            let selectElements = '';
+            for (let i = 1; i <= numberoflanes; i++) {
+                selectElements += `
+                    <label for="lane${i}">Lane Number ${i}:</label>
+                    <select name="lane${i}" id="lane${i}" required>
+                        {% for lane in lanes %}
+                            <option value="{{ lane }}">{{ lane }}</option>
+                        {% endfor %}
+                    </select>
+                    <br><br>
+                `;
+            }
+            container.innerHTML = selectElements;
+        });
+        
+        // Trigger change event for numberoflanes to show one Lane Number dropdown by default
+        document.getElementById('numberoflanes').dispatchEvent(new Event('change'));
+    </script>
+</body>
+</html>
