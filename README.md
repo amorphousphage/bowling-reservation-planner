@@ -1,4 +1,4 @@
-#bowling lane reservation planner
+# bowling lane reservation planner
 
 A flask application for displaying and recording bowling lane reservations for any bowling center.
 
