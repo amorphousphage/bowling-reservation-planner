@@ -29,6 +29,7 @@ This application is still in early development and not ready for use.
 - Edit Check (Warning Message) if a reservation is booked on a defective lane
 - GUI to change the amount of lanes and the timeframe displayed
 - Translations for the following languages with a GUI indicator to switch: English, French, Italian, Spanish
+- Add more comments to make the code clearer
 - Reservation planner for Billards
 
 ## technical specifications
