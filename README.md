@@ -24,9 +24,9 @@ A flask application for displaying and recording bowling lane reservations for a
 This application is still in early development and not ready for use.
 
 ## features to be added in the future
-- Edit Check (Error Message) if a new/update reservation is overlapping with an existing one
-- Edit Check (Warning Message) if kids are indicated for a lane, but one of the selected lanes does not have side bumpers installed)
-- Edit Check (Warning Message) if a reservation is booked on a defective lane
+- Validation Check (Error Message) if a new/update reservation is overlapping with an existing one
+- Validation Check (Warning Message) if kids are indicated for a lane, but one of the selected lanes does not have side bumpers installed)
+- Validation Check (Warning Message) if a reservation is booked on a defective lane
 - GUI to change the amount of lanes and the timeframe displayed
 - Translations for the following languages with a GUI indicator to switch: English, French, Italian, Spanish
 - Add more comments to make the code clearer
