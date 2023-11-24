@@ -1,14 +1,18 @@
+#Import necessary modules and translations.py
 from flask import Flask, render_template, request, redirect, url_for, jsonify, Response
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import numpy as np
 from datetime import datetime, timedelta
+from translations import *
 
+#Setup app name and database connection
 app = Flask(__name__, template_folder='templates')  # Set the template folder
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:password@localhost/bowlingreservation'
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
+#Define reservation table design
 class Reservation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
@@ -20,63 +24,29 @@ class Reservation(db.Model):
     lanes = db.Column(db.String(100))
     specialevent = db.Column(db.String(200))
 
+#Define defective lane table design
 class DefectiveLane(db.Model):
     lane_number = db.Column(db.Integer, primary_key=True, unique=True)
     is_defective = db.Column(db.Boolean, default=False)
-#Translation dictionary (german)
-translations_de = {
-    "Add Bowling Data":"Reservierung aktualisieren",
-    "Name":"Name",
-    "Date":"Datum",
-    "Start Time":"Start Zeit",
-    "duration (hours)":"Dauer (Stunden)",
-    "Number of Players": "Anzahl Spieler",
-    "Kids Playing?":"Mit Kind?",
-    "Select Lane Number(s)":"Bahn(en) auswählen",
-    "Lane":"Bahn",
-    "Special Event":"Spezialevent",
-    "No":"Nein",
-    "Kid Birthday Variant 1": "Geburtstag Variante 1",
-    "Kid Birthday Variant 2": "Geburtstag Variante 2",
-    "Add Reservation": "Neue Reservation",
-    "Save New Reservation": "Reservation abschliessen",
-    "Back":"Zurück",
-    "Bowling Lane Schedule":"Bowling Reservationen",
-    "Bowling Lane Schedule for ":"Bowling Reservationen für ",
-    "Today":"Heute",
-    "Show Reservations":"Reservationen anzeigen",
-    "OK":"OK",
-    "Defective":"Defekt",
-    "players":"Spieler",
-    "with kids":" mit Kind",
-    "Update Bowling Data":"Reservation aktualisieren",
-    "Update Reservation":"Reservation aktualisieren",
-    "Delete Reservation":"Reservation löschen"
-}
-days_de = {
-    'Monday': 'Montag',
-    'Tuesday': 'Dienstag',
-    'Wednesday': 'Mittwoch',
-    'Thursday': 'Donnerstag',
-    'Friday': 'Freitag',
-    'Saturday': 'Samstag',
-    'Sunday': 'Sonntag'
-}
 
-months_de = {
-    'January': 'Januar',
-    'February': 'Februar',
-    'March': 'März',
-    'April': 'April',
-    'May': 'Mai',
-    'June': 'Juni',
-    'July': 'Juli',
-    'August': 'August',
-    'September': 'September',
-    'October': 'Oktober',
-    'November': 'November',
-    'December': 'Dezember'
-}
+#Select appropriate translation for the webpage
+def select_language(language):
+    if language == "en":
+        return translations_en, days_en, months_en
+    elif language == "de":
+        return translations_de, days_de, months_de
+    elif language == "it":
+        return translations_it, days_it, months_it
+    elif language == "fr":
+        return translations_fr, days_fr, months_fr
+    elif language == "es":
+        return translations_es, days_es, months_es
+    else:
+        return translations_en, days_en, months_en
+
+#Set the appriopriate translation for the webpage
+preferred_language = "de"
+translations_selected, days_selected, months_selected = select_language(preferred_language)
 
 # Define the number of lanes and time range
 num_lanes = 12
@@ -87,12 +57,14 @@ end_time = 26 * 60  # End time in minutes (02:00 on the next day)
 time_slots = np.arange(start_time, end_time, 30)  # 30-minute intervals
 time_slots_str = '[' + ', '.join(map(str, time_slots)) + ']'
 
+#Convert the date string for a given day as indicated in the URL to a date, otherwise select today
 def convert_to_date(date_string):
     try:
         return datetime.strptime(date_string, '%Y-%m-%d')
     except ValueError:
         return datetime.now().date()
 
+#Route for the index homepage (Show the reservation planner)
 @app.route('/', methods=['GET'])
 @app.route('/<date>', methods=['GET'])
 def display_schedule(date=None): 
@@ -105,21 +77,23 @@ def display_schedule(date=None):
     if selected_date:
         requested_date = convert_to_date(selected_date)
         date = requested_date.strftime('%Y-%m-%d')  # Get the formatted date to pass to the URL
-    #translate day name and month to german
-    translated_day = days_de[requested_date.strftime('%A')]
-    translated_month = months_de[requested_date.strftime('%B')]
     
-    # Calculate previous and next dates
+    #translate day name and month to the language selected (for the title)
+    translated_day = days_selected[requested_date.strftime('%A')]
+    translated_month = months_selected[requested_date.strftime('%B')]
+    
+    # Calculate previous and next dates (for the <<< and >>> buttons)
     prev_date = (requested_date - timedelta(days=1)).strftime('%Y-%m-%d')
     next_date = (requested_date + timedelta(days=1)).strftime('%Y-%m-%d')
 
     # Get defective states for all lanes
     defective_states = {lane.lane_number: lane.is_defective for lane in DefectiveLane.query.all()}
 
-    
+    #Get the reservations for the selected date from the database
     reservations = Reservation.query.filter_by(date=requested_date).all()
     lane_reservations = {lane: {time_slot: None for time_slot in time_slots} for lane in range(num_lanes)}
-
+    
+    #Store the reservation data in a variable
     for reservation in reservations:
         lanes = reservation.lanes.split(',')  # Split the stored lane string into individual lanes
         start_time = reservation.start_time.strftime('%H:%M')
@@ -137,20 +111,24 @@ def display_schedule(date=None):
                         'kids': reservation.kids,
                         'specialevent': reservation.specialevent
                     }
+                    #Mark the succeeding slots after the start time for a reservation as "occupied"
                     for j in range(1, duration_slots):
                         lane_reservations[lane][time_slots[i + j]] = 'occupied'
     
+    #Get the lane status for each lane
     lane_defective_states = {}
     for lane in range(num_lanes):
         defective_lane = DefectiveLane.query.filter_by(lane_number=lane + 1).first()
         lane_defective_states[lane] = defective_lane.is_defective if defective_lane else False
     
-    
-    return render_template('schedule.html', num_lanes=num_lanes, time_slots=time_slots, time_slots_str=time_slots_str, lane_reservations=lane_reservations, requested_date=requested_date, prev_date=prev_date, next_date=next_date, lane_defective_states=lane_defective_states, translations_de=translations_de, translated_day=translated_day, translated_month=translated_month)
+    #Display the schedule.html with the indicated variables passed to it
+    return render_template('schedule.html', num_lanes=num_lanes, time_slots=time_slots, time_slots_str=time_slots_str, lane_reservations=lane_reservations, requested_date=requested_date, prev_date=prev_date, next_date=next_date, lane_defective_states=lane_defective_states, translations_selected=translations_selected, translated_day=translated_day, translated_month=translated_month)
 
+#Define message for reaching a password-protected page
 def home():
     return 'This is a protected page!'
 
+#Setup the simple password protection for the website
 @app.before_request
 def check_auth():
     auth = request.authorization
@@ -160,12 +138,19 @@ def check_auth():
 def authenticate():
     return Response('Please authenticate.', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
 
+#Route for the page of adding a reservation
 @app.route('/add_data')
 def add_data():
+	#Format the date to auto-populate in the new reservation
     today = datetime.today().strftime('%d-%b-%Y')
-    return render_template('add_data.html', num_lanes=num_lanes, lanes=range(1, num_lanes + 1), today=today, translations_de=translations_de)
+    
+    #Display the add_data.html with the indicated variables passed to it
+    return render_template('add_data.html', num_lanes=num_lanes, lanes=range(1, num_lanes + 1), today=today, translations_selected=translations_selected)
+
+#Route for the page of submitting reservation data into the database
 @app.route('/submit_data', methods=['POST'])
 def submit_data():
+	#obtain and derive the values to be stored in the database
     name = request.form.get('name')
     date = datetime.strptime(request.form.get('date'), '%d-%b-%Y').date()
     start_time = datetime.strptime(request.form.get('start_time'), '%H:%M').time()
@@ -195,21 +180,24 @@ def submit_data():
     )
     db.session.add(new_reservation)
     db.session.commit()
-
+	
+	# Re-route to show the schedule after submitting a reservation
     return redirect(url_for('display_schedule'))
     
-
+#Route for the page of updating a reservation
 @app.route('/update_data', methods=['GET'])
 def update_data():
+	#Obtain the reservation from the database indicated by its unique ID
     reservation_id = request.args.get('id')
     reservation = Reservation.query.filter_by(id=reservation_id).first()
     
+    #Populate update_data.html with the data from the database
     if reservation:
-        return render_template('update_data.html', reservation=reservation, lanes=range(1, num_lanes + 1), translations_de=translations_de)
+        return render_template('update_data.html', reservation=reservation, lanes=range(1, num_lanes + 1), translations_selected=translations_selected)
     else:
         return "Reservation not found", 404
 
-    
+#Route for updating or deleting reservation data in the database
 @app.route('/update_reservation', methods=['POST'])
 def update_reservation():
     action = request.form.get('action')
@@ -217,6 +205,7 @@ def update_reservation():
     # Query the database to get the reservation entry
     reservation = Reservation.query.filter_by(id=reservation_id).first()
    
+    #Action if Update button is pressed
     if action == 'Update':
         # Extract updated reservation data from the form
         kids_playing = 1 if 'kids' in request.form else 0
@@ -253,6 +242,7 @@ def update_reservation():
         # Redirect to the schedule page or any other page after successful update
         return redirect(url_for('display_schedule'))
     
+    #Action if Delete button is pressed
     elif action == 'Delete':
 
         print(reservation)
@@ -265,8 +255,11 @@ def update_reservation():
             
     return "Invalid action or reservation not found", 404
 
+#Route for updating an "OK" or "Defective" Lane status in the database
 @app.route('/update_defective_state', methods=['POST'])
 def update_defective_state():
+	
+	#Obtain lane number and state
     lane_number = request.form.get('laneNumber')
     is_defective_str = request.form.get('isDefective')
 

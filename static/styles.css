@@ -6,8 +6,8 @@ table {
 
 		a:link,
 		a:visited {
-			color: inherit; /* or specify your desired color */
-			text-decoration: none; /* or specify the decoration you prefer */
+			color: inherit;
+			text-decoration: none;
 		}
 
 td, th {

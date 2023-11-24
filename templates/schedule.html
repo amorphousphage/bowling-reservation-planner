@@ -3,8 +3,8 @@
 <head>
 	<meta http-equiv="refresh" content="20">
 
-    <title>{{ translations_de.get("Bowling Lane Schedule") }}</title>
-
+    <title>{{ translations_selected.get("Bowling Lane Schedule") }}</title>
+	<!-- get scripts for datepicker, translation of datepicker and load the styles.css sheet-->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 	
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -16,68 +16,80 @@
 </head>
 <body>
 	
-<h1>{{ translations_de.get("Bowling Lane Schedule for ") }}{{ translated_day }}, {{ requested_date.strftime('%d. ') }}{{ translated_month }} {{ requested_date.strftime('%Y') }}</h1>
+<h1>{{ translations_selected.get("Bowling Lane Schedule for ") }}{{ translated_day }}, {{ requested_date.strftime('%d. ') }}{{ translated_month }} {{ requested_date.strftime('%Y') }}</h1>
 
-    
+<!-- Previous Date button-->
 <form class="inlineform" action="{{ url_for('display_schedule', date=prev_date) }}">
 	<button class="datebuttons">&lt;&lt;&lt;</button>
 </form>
 
+<!-- Today button-->
 <form class="inlineform" action="/">
-   	<button class="datebuttons">{{ translations_de.get("Today") }}</button>
+   	<button class="datebuttons">{{ translations_selected.get("Today") }}</button>
 </form>
 
+<!-- Next Date button-->
 <form class="inlineform" action="{{ url_for('display_schedule', date=next_date) }}">
 	<button class="datebuttons">&gt;&gt;&gt;</button>
 </form>
 
+<!-- Calendar Icon and Show Reservations button-->
 <form class="inlineform" action="{{ url_for('display_schedule') }}" method="GET">
     <label for="datepicker" class="calendar-icon">
         <i class="fas fa-calendar-alt" onclick="$('#datepicker').datepicker('show');"></i>
     </label>
     <input type="text" id="datepicker" name="selected_date">
-    <button class="datebuttons">{{ translations_de.get("Show Reservations") }}</button>
+    <button class="datebuttons">{{ translations_selected.get("Show Reservations") }}</button>
 </form>
 <br>
+
+<!-- New Reservation Button-->
 <form class = "inlineform" action="{{ url_for('add_data') }}">
-	<button class="addupdatereservationbutton">{{ translations_de.get("Add Reservation") }}</button>
+	<button class="addupdatereservationbutton">{{ translations_selected.get("Add Reservation") }}</button>
 </form>
 <br><br>
     <table>
         <tr>
+			<!-- Generate Header with Time Slots for the indicated time frame in 30 minute intervals-->
             <th></th>
             {% for time_slot in time_slots %}
                 <th>{{ "%02d:%02d" % ((time_slot // 60) % 24, time_slot % 60) }}</th>
             {% endfor %}
         </tr>
+        <!-- Generate the Lane number title in the left column plus the "OK" and "Defective" buttons-->
         {% for lane in range(num_lanes) %}
             <tr data-lane="{{ lane + 1}}">
 				<td><div>
-					<strong>{{ translations_de.get("Lane") }} {{ lane + 1 }}</strong><br>
+					<strong>{{ translations_selected.get("Lane") }} {{ lane + 1 }}</strong><br>
 					<label class="ok-label">
-						<input type="radio" id="lane_status_{{ lane + 1 }}_ok" name="lane_status_{{ lane + 1 }}" value="ok" {% if not lane_defective_states[lane] %}checked{% endif %}> {{ translations_de.get("OK") }}
+						<input type="radio" id="lane_status_{{ lane + 1 }}_ok" name="lane_status_{{ lane + 1 }}" value="ok" {% if not lane_defective_states[lane] %}checked{% endif %}> {{ translations_selected.get("OK") }}
 					</label>
 					<label class="defective-label">
-						<input type="radio" id="lane_status_{{ lane + 1 }}_defective" name="lane_status_{{ lane + 1 }}" value="defective" {% if lane_defective_states[lane] %}checked{% endif %}> {{ translations_de.get("Defective") }}
+						<input type="radio" id="lane_status_{{ lane + 1 }}_defective" name="lane_status_{{ lane + 1 }}" value="defective" {% if lane_defective_states[lane] %}checked{% endif %}> {{ translations_selected.get("Defective") }}
 					</label>
 				</div></td>
+				<!-- Interate through all time slots for a lane-->
                 {% for time_slot in time_slots %}
+					<!-- If a Reservation with a start time is found and is not "occupied"-->
                     {% if lane_reservations[lane][time_slot] %}
                         {% if lane_reservations[lane][time_slot] != 'occupied' %}
+							<!-- Span the columns for the duration of the reservation and populate the cell with reservation data-->
                             <td colspan={{ lane_reservations[lane][time_slot]['duration_slots'] }} class="reservation">
 								<a href="/update_data?id={{ lane_reservations[lane][time_slot]['id'] }}">
                                 {{ lane_reservations[lane][time_slot]['name'] }}<br>
                                 {% if lane_reservations[lane][time_slot]['players'] %}
-									{{ lane_reservations[lane][time_slot]['players'] }} {{ translations_de.get("players") }}
+									{{ lane_reservations[lane][time_slot]['players'] }} {{ translations_selected.get("players") }}
 								{% endif %}
                                 {% if lane_reservations[lane][time_slot]['kids'] == 1 %}
-									{{ translations_de.get("with kids") }} <br>
+									{{ translations_selected.get("with kids") }} <br>
 								{% endif %}
 								{% if lane_reservations[lane][time_slot]['specialevent'] != "No" %}
 									{{ lane_reservations[lane][time_slot]['specialevent'] }}
 								{% endif %}
                             </td>
+                        <!-- Don't draw another cell, when the reservation time is still ongoing and the lane is "occupied"-->
                         {% elif lane_reservations[lane][time_slot] == 'occupied'%}
+                        <!-- If Lane is not occupied and no reservation exists, draw an empty cell-->
                         {% else %}
                             <td></td>
                         {% endif %}
@@ -90,19 +102,19 @@
     </table>
     
 <script>
+	// function for the datepicker
     $(function() {
 		$.datepicker.setDefaults($.datepicker.regional['de']);
         $("#datepicker").datepicker({
-            dateFormat: 'yy-mm-dd', // Format the date as needed
+            dateFormat: 'yy-mm-dd',
             changeMonth: true,
             changeYear: true,
-            // Additional options can be added based on your preferences
         });
     });
 </script>
     
 <script>
-    // JavaScript for radio button event listeners
+    // JavaScript for radio button event listeners for updating to defective state
     const defectiveRadioButtons = document.querySelectorAll('input[value="defective"]');
     defectiveRadioButtons.forEach(button => {
         button.addEventListener('change', function () {
@@ -119,6 +131,7 @@
         });
     });
 
+    // JavaScript for radio button event listeners for updating to ok state
     const okRadioButtons = document.querySelectorAll('input[value="ok"]');
     okRadioButtons.forEach(button => {
         button.addEventListener('change', function () {
@@ -158,6 +171,7 @@
     }
 </script>
 <script>
+  //script for highlighting the current time slot in red for the current day
   var time_slots = {{ time_slots_str }};
   var headerRow = document.querySelector('tr:nth-child(1)'); // Select the first row (header row)
   var currentTime = new Date();

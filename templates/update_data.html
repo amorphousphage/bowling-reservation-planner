@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{ translations_de.get("Update Bowling Data") }}</title>
-
+    <title>{{ translations_selected.get("Update Bowling Data") }}</title>
+	<!-- get scripts for date picker and import the styles.css-->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
@@ -10,62 +10,62 @@
     <link rel="stylesheet" href="../static/styles.css">
 </head>
 <body class="update-data">
-    <h1>{{ translations_de.get("Update Bowling Data") }}</h1>
+    <h1>{{ translations_selected.get("Update Bowling Data") }}</h1>
     <form class="inlineform" method="POST" action="/update_reservation">
-        <label for="date">{{ translations_de.get("Date") }}:</label>
+        <label for="date">{{ translations_selected.get("Date") }}:</label>
         <input type="text" id="date" name="date" value="{{ reservation.date.strftime('%d-%b-%Y') }}" required>
         
         <br><br>
 
-        <label for="name">{{ translations_de.get("Name") }}:</label>
+        <label for="name">{{ translations_selected.get("Name") }}:</label>
         <input type="text" id="name" name="name" value="{{reservation.name }}" required><br><br>
 
-        <label for="start_time">{{ translations_de.get("Start Time") }} (HH:MM):</label>
+        <label for="start_time">{{ translations_selected.get("Start Time") }} (HH:MM):</label>
         <input type="text" id="start_time" name="start_time" value="{{reservation.start_time.strftime('%H:%M')}}" required><br><br>
 
-        <label for="duration">{{ translations_de.get("duration (hours)") }}:</label>
+        <label for="duration">{{ translations_selected.get("duration (hours)") }}:</label>
         <input type="number" step="0.5" id="duration" name="duration" value="{{reservation.duration}}" required><br><br>
 
-        <label for="players">{{ translations_de.get("Number of Players") }}:</label>
+        <label for="players">{{ translations_selected.get("Number of Players") }}:</label>
         <input type="number" id="players" name="players" value="{{reservation.players}}" ><br><br>
         
-		<label for="kids">{{ translations_de.get("Kids Playing?") }}</label>
+		<label for="kids">{{ translations_selected.get("Kids Playing?") }}</label>
 		<input type="checkbox" id="kids" name="kids" {% if reservation.kids == 1 %}checked{% endif %} value="1"><br><br>
 
-		<label for="lanes">{{ translations_de.get("Select Lane Number(s)") }}:</label><br>
+		<label for="lanes">{{ translations_selected.get("Select Lane Number(s)") }}:</label><br>
 		{% for lane in lanes %}
 			<input type="checkbox" id="lane_{{ lane }}" name="lanes[]" value="{{ lane }}"
 				{% if lane in reservation.lanes.split(',')|map('int') %}checked{% endif %}>
-			<label for="lane_{{ lane }}">{{ translations_de.get("Lane") }} {{ lane }}</label><br>
+			<label for="lane_{{ lane }}">{{ translations_selected.get("Lane") }} {{ lane }}</label><br>
 		{% endfor %}
 		<br>
         
-        <label for="special_event">{{ translations_de.get("Special Event") }}:</label>
+        <label for="special_event">{{ translations_selected.get("Special Event") }}:</label>
 		<select id="special_event" name="special_event">
 			<option value="No" {% if reservation.specialevent == "No" %}selected{% endif %}>No</option>
-			<option value="{{ translations_de.get("Kid Birthday Variant 1") }}" {% if reservation.specialevent == translations_de.get("Kid Birthday Variant 1") %}selected{% endif %}>{{ translations_de.get("Kid Birthday Variant 1") }}</option>
-			<option value="{{ translations_de.get("Kid Birthday Variant 2") }}" {% if reservation.specialevent == translations_de.get("Kid Birthday Variant 2") %}selected{% endif %}>{{ translations_de.get("Kid Birthday Variant 2") }}</option>
+			<option value="{{ translations_selected.get("Kid Birthday Variant 1") }}" {% if reservation.specialevent == translations_selected.get("Kid Birthday Variant 1") %}selected{% endif %}>{{ translations_selected.get("Kid Birthday Variant 1") }}</option>
+			<option value="{{ translations_selected.get("Kid Birthday Variant 2") }}" {% if reservation.specialevent == translations_selected.get("Kid Birthday Variant 2") %}selected{% endif %}>{{ translations_selected.get("Kid Birthday Variant 2") }}</option>
 		</select><br><br>
 
 		<input type="hidden" id="reservation_id" name="reservation_id" value="{{ reservation.id }}">
 		<input type="hidden" name="action" id="formAction" value="Update">
 
-		<button class="addupdatereservationbutton" onclick="updateReservation()">{{ translations_de.get("Update Reservation") }}</button>
-		<button class="deletereservationbutton" onclick="deleteReservation()">{{ translations_de.get("Delete Reservation") }}</button>
-		<button class="backbutton" onclick="goBack(event)">{{ translations_de.get("Back") }}</button>
+		<button class="addupdatereservationbutton" onclick="updateReservation()">{{ translations_selected.get("Update Reservation") }}</button>
+		<button class="deletereservationbutton" onclick="deleteReservation()">{{ translations_selected.get("Delete Reservation") }}</button>
+		<button class="backbutton" onclick="goBack(event)">{{ translations_selected.get("Back") }}</button>
     </form>
         <script>
+			// function for the datepicker
 			$(function() {
 				$("#date").datepicker({
-					dateFormat: 'dd-M-yy', // Format the date as needed
+					dateFormat: 'dd-M-yy',
 					changeMonth: true,
 					changeYear: true,
-					// Additional options can be added based on your preferences
 				});
 			});
 		</script>
         <script>
-            // Format start time as HH:MM while typing
+            // Format start time as HH:MM while typing. typing the : is not necessary
             $(function() {
                 $('#start_time').on('input', function() {
                     var val = $(this).val();
@@ -75,19 +75,22 @@
             });
         </script>
         <script>
+	// function for the Update button
     function updateReservation() {
         document.getElementById('formAction').value = 'Update';
         document.getElementById('reservationForm').submit();
     }
-
+	// function for the Delete button
     function deleteReservation() {
         document.getElementById('formAction').value = 'Delete';
         document.getElementById('reservationForm').submit();
     }
+    // function for the back button
     function goBack(event) {
 		event.preventDefault();
 		window.history.back();
 	}
+	// function to not save the entered data when the page is left without pressing the update button
 	window.onbeforeunload = function() {
     // Clear form data or reset the form fields here
     document.getElementById('reservationForm').reset();
