@@ -1,5 +1,5 @@
 #Import necessary modules and translations.py
-from flask import Flask, render_template, request, redirect, url_for, jsonify, Response
+from flask import Flask, render_template, request, redirect, url_for, Response
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import numpy as np
@@ -85,9 +85,6 @@ def display_schedule(date=None):
     # Calculate previous and next dates (for the <<< and >>> buttons)
     prev_date = (requested_date - timedelta(days=1)).strftime('%Y-%m-%d')
     next_date = (requested_date + timedelta(days=1)).strftime('%Y-%m-%d')
-
-    # Get defective states for all lanes
-    defective_states = {lane.lane_number: lane.is_defective for lane in DefectiveLane.query.all()}
 
     #Get the reservations for the selected date from the database
     reservations = Reservation.query.filter_by(date=requested_date).all()
