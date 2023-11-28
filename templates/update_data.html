@@ -21,7 +21,7 @@
         <input type="text" id="name" name="name" value="{{reservation.name }}" required><br><br>
 
         <label for="start_time">{{ translations_selected.get("Start Time") }} (HH:MM):</label>
-        <input type="text" id="start_time" name="start_time" value="{{reservation.start_time.strftime('%H:%M')}}" required><br><br>
+        <input type="time" step="1800" id="start_time" name="start_time" value="{{reservation.start_time.strftime('%H:%M')}}" required><br><br>
 
         <label for="duration">{{ translations_selected.get("duration (hours)") }}:</label>
         <input type="number" step="0.5" id="duration" name="duration" value="{{reservation.duration}}" required><br><br>
@@ -50,7 +50,7 @@
 		<input type="hidden" id="reservation_id" name="reservation_id" value="{{ reservation.id }}">
 		<input type="hidden" name="action" id="formAction" value="Update">
 
-		<button class="addupdatereservationbutton" onclick="updateReservation()">{{ translations_selected.get("Update Reservation") }}</button>
+		<button class="addupdatereservationbutton" type="submit">{{ translations_selected.get("Update Reservation") }}</button>
 		<button class="deletereservationbutton" onclick="deleteReservation()">{{ translations_selected.get("Delete Reservation") }}</button>
 		<button class="backbutton" onclick="goBack(event)">{{ translations_selected.get("Back") }}</button>
     </form>
@@ -65,16 +65,8 @@
 			});
 		</script>
         <script>
-            // Format start time as HH:MM while typing. typing the : is not necessary
-            $(function() {
-                $('#start_time').on('input', function() {
-                    var val = $(this).val();
-                    var formatted = val.replace(/(\d{2})(\d{2})/, '$1:$2');
-                    $(this).val(formatted);
-                });
-            });
-        </script>
-        <script>
+	// listener for the type="submit" button to be pushed, which allows for validating the form
+	document.getElementById('reservationForm').addEventListener("submit",updateReservation);
 	// function for the Update button
     function updateReservation() {
         document.getElementById('formAction').value = 'Update';
@@ -90,12 +82,8 @@
 		event.preventDefault();
 		window.history.back();
 	}
-	// function to not save the entered data when the page is left without pressing the update button
-	window.onbeforeunload = function() {
-    // Clear form data or reset the form fields here
-    document.getElementById('reservationForm').reset();
-	}
-</script>
+
+	</script>
         
 </body>
 </html>

@@ -107,6 +107,18 @@ body {
 	border-radius: 170px;
 }
 
+.namebutton {
+	margin-bottom: 20px;
+	background-color: #0087ff;
+	padding: 30px 30px;
+	font-size: 30px;
+	text-align: center;
+	text-decoration: none;
+	outline: none;
+	border: none;
+	border-radius: 40px;
+}
+
 .calendar-icon i {
 	font-size: 80px;
 	margin-left: 80px;
@@ -188,6 +200,18 @@ body {
 	color: #fff;
 	border: none;
 	border-radius: 150px;
+}
+
+.namebutton {
+	margin-bottom: 20px;
+	background-color: #808080;
+	padding: 10px 10px;
+	font-size: 15px;
+	text-align: center;
+	text-decoration: none;
+	outline: none;
+	border: none;
+	border-radius: 40px;
 }
 
 .calendar-icon i {

@@ -10,7 +10,7 @@
 </head>
 <body class="add-data">
     <h1>{{ translations_selected.get("Add Bowling Data") }}</h1>
-    <form class="inlineform" method="POST" action="/submit_data">
+    <form class="inlineform" method="POST" id="reservationForm">
         <label for="date">{{ translations_selected.get("Date") }}:</label>
         <input type="text" id="date" name="date" value="{{ today }}" required>
         <script>
@@ -27,21 +27,13 @@
         <br><br>
 
         <label for="name">{{ translations_selected.get("Name") }}:</label>
-        <input type="text" id="name" name="name" required><br><br>
+        <input type="text" id="name" name="name" required>
+        <button type="button" class="namebutton" id="no_name_button">{{ translations_selected.get("[Name unknown]") }}</button>
+        <button type="button" class="namebutton" id="no_reservation_button">{{ translations_selected.get("[spontaneous]") }}</button>
+        <br><br>
 
         <label for="start_time">{{ translations_selected.get("Start Time") }} (HH:MM):</label>
-        <input type="text" id="start_time" name="start_time" required><br><br>
-
-        <script>
-            // Format start time as HH:MM while typing. typing the : is not necessary
-            $(function() {
-                $('#start_time').on('input', function() {
-                    var val = $(this).val();
-                    var formatted = val.replace(/(\d{2})(\d{2})/, '$1:$2');
-                    $(this).val(formatted);
-                });
-            });
-        </script>
+        <input type="time" step="1800" id="start_time" name="start_time" required><br><br>
 
         <label for="duration">{{ translations_selected.get("duration (hours)") }}:</label>
         <input type="number" step="0.5" id="duration" name="duration" required><br><br>
@@ -65,25 +57,46 @@
             <option value="{{ translations_selected.get("Kid Birthday Variant 1") }}">{{ translations_selected.get("Kid Birthday Variant 1") }}</option>
             <option value="{{ translations_selected.get("Kid Birthday Variant 2") }}">{{ translations_selected.get("Kid Birthday Variant 2") }}</option>
         </select><br><br>
-		<button class="addupdatereservationbutton" onclick="addReservation()">{{ translations_selected.get("Save New Reservation") }}</button>
+		<button class="addupdatereservationbutton" type="submit">{{ translations_selected.get("Save New Reservation") }}</button>
 		<button class="backbutton" onclick="goBack(event)">{{ translations_selected.get("Back") }}</button>
     </form>
     <script>
-	// function for the Update button
+	// listener for the type="submit" button to be pushed, which allows for validating the form
+	document.getElementById('reservationForm').addEventListener("submit",addReservation);
+	// function for the New Reservation button
      function addReservation() {
-        document.getElementById('formAction').value = 'Update';
-        document.getElementById('reservationForm').submit();
-        }
+			document.getElementById('reservationForm').action = '/submit_data';
+			document.getElementById('reservationForm').submit();
+     }
     // function for the back button
     function goBack(event) {
 		event.preventDefault();
-		window.history.back();
+		window.location.href = '/';
 		}
-	// function to not save the entered data when the page is left without pressing the update button
-	window.onbeforeunload = function() {
-    // Clear form data or reset the form fields here
-    document.getElementById('reservationForm').reset();
-	}
+	
+	var translations = {
+		NoName:  "{{ translations_selected.get('[Name unknown]') }}",
+		spontaneousName:  "{{ translations_selected.get('[spontaneous]') }}",
+		}
+	// listener for the "No Name" button
+    document.getElementById('no_name_button').addEventListener('click', function() {
+        // Set the name field value to "No Name"
+        document.getElementById('name').value = translations.NoName;
+    });
+    
+    // listener for the "spontaneous" button to set the name
+    document.getElementById('no_reservation_button').addEventListener('click', function() {
+        // Set the name field value to "spontaneous"
+        document.getElementById('name').value = translations.spontaneousName;
+    });
+    // listener for the "spontaneous" button to set the start time to now
+	document.getElementById('no_reservation_button').addEventListener('click', function() {
+        var now = new Date();
+        var minutes = now.getMinutes();
+        var roundedMinutes = (minutes < 30) ? '00' : '30';
+        var roundedTime = now.getHours() + ':' + roundedMinutes;
+        document.getElementById('start_time').value = roundedTime;
+    });
 	</script>
 </body>
 </html>

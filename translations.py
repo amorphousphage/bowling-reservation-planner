@@ -26,7 +26,12 @@ translations_de= {
     "with kids":" mit Kind",
     "Update Bowling Data":"Reservation aktualisieren",
     "Update Reservation":"Reservation aktualisieren",
-    "Delete Reservation":"Reservation löschen"
+    "Delete Reservation":"Reservation löschen",
+    "A selected lane is defective. Do you want to proceed?": "Mindestens eine ausgewählte Bahn ist als defekt markiert. Buchung fortfahren?",
+	"Kids playing is indicated, but a selected lane does not have bumpers. Do you want to proceed?": "Es spielen Kinder mit, aber mindestens eine der ausgewählten Bahnen hat keine Bumper. Buchung fortfahren?",
+	"There is an overlap with an existing reservation for this lane. Please update this reservation.": "Diese Reservation überschneidet sich mit einer bereits Bestehenden. Bitte diese Reservation updaten",
+	"[Name unknown]":"[Name unbekannt]",
+	"[spontaneous]":"[spontan]"
 }
 days_de = {
     'Monday': 'Montag',
@@ -80,7 +85,11 @@ translations_en= {
     "with kids":" with kins",
     "Update Bowling Data":"Update reservation",
     "Update Reservation":"Update reservation",
-    "Delete Reservation":"Delete reservation"
+    "Delete Reservation":"Delete reservation",
+    "A selected lane is defective. Do you want to proceed?": "At least one selected lane is defective. Do you want to proceed?",
+	"Kids playing is indicated, but a selected lane does not have bumpers. Do you want to proceed?": "Kids are indicated to play, but at least one selected lane does not have bumpers. Do you want to proceed?",
+	"[Name unknown]":"[Name unknown]",
+	"[spontaneous]":"[spontaneous]"
 }
 
 days_en = {
@@ -135,7 +144,11 @@ translations_it = {
     "with kids": "con bambini",
     "Update Bowling Data": "Aggiorna prenotazione",
     "Update Reservation": "Aggiorna prenotazione",
-    "Delete Reservation": "Elimina prenotazione"
+    "Delete Reservation": "Elimina prenotazione",
+    "At least one selected lane is defective. Do you want to proceed?": "Almeno una corsia selezionata è difettosa. Desideri procedere?",
+    "Kids are indicated to play, but at least one selected lane does not have bumpers. Do you want to proceed?": "Si indica che i bambini stanno giocando, ma almeno una corsia selezionata non ha le protezioni laterali. Desideri procedere?",
+    "[Name unknown]": "[Nome sconosciuto]",
+    "[spontaneous]": "[spontaneo]"
 }
 
 days_it = {
@@ -190,7 +203,11 @@ translations_fr = {
     "with kids": "avec enfants",
     "Update Bowling Data": "Mettre à jour la réservation",
     "Update Reservation": "Mettre à jour la réservation",
-    "Delete Reservation": "Supprimer la réservation"
+    "Delete Reservation": "Supprimer la réservation",
+    "At least one selected lane is defective. Do you want to proceed?": "Au moins une piste sélectionnée est défectueuse. Voulez-vous continuer ?",
+    "Kids are indicated to play, but at least one selected lane does not have bumpers. Do you want to proceed?": "Il est indiqué que les enfants jouent, mais au moins une piste sélectionnée n'a pas de pare-chocs. Voulez-vous continuer ?",
+    "[Name unknown]": "[Nom inconnu]",
+    "[spontaneous]": "[spontané]"
 }
 
 days_fr = {
@@ -245,7 +262,11 @@ translations_es = {
     "with kids": "con niños",
     "Update Bowling Data": "Actualizar reserva",
     "Update Reservation": "Actualizar reserva",
-    "Delete Reservation": "Eliminar reserva"
+    "Delete Reservation": "Eliminar reserva",
+    "At least one selected lane is defective. Do you want to proceed?": "Al menos una pista seleccionada está defectuosa. ¿Desea proceder?",
+    "Kids are indicated to play, but at least one selected lane does not have bumpers. Do you want to proceed?": "Se indica que hay niños jugando, pero al menos una pista seleccionada no tiene parachoques. ¿Desea proceder?",
+    "[Name unknown]": "[Nombre desconocido]",
+    "[spontaneous]": "[espontáneo]"
 }
 
 days_es = {

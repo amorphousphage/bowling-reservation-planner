@@ -8,7 +8,7 @@ from translations import *
 
 #Setup app name and database connection
 app = Flask(__name__, template_folder='templates')  # Set the template folder
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:password@localhost/bowlingreservation'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:password@localhost/ChristianTeppich$bowlingreservation'
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
@@ -48,10 +48,17 @@ def select_language(language):
 preferred_language = "de"
 translations_selected, days_selected, months_selected = select_language(preferred_language)
 
-# Define the number of lanes and time range
+#
+# SET UP YOUR CENTER SETTINGS BELOW
+#
+
+# Define the number of lanes, if they have bumpers and time range to be displayed
 num_lanes = 12
-start_time = 12 * 60  # Start time in minutes (12:00)
-end_time = 26 * 60  # End time in minutes (02:00 on the next day)
+non_bumper_lanes = [7,8,9,10,11,12]
+start_time = 12 * 60  # Start time in minutes (e.g. 12 for 12:00)
+end_time = 26 * 60  # End time in minutes (if the End Time is past midnight, write 24 + hour (e.g. 26 for 2 am, as it is 24+2))
+
+# --------------------------------------------------------------------------
 
 # Generate time slots
 time_slots = np.arange(start_time, end_time, 30)  # 30-minute intervals
@@ -63,6 +70,20 @@ def convert_to_date(date_string):
         return datetime.strptime(date_string, '%Y-%m-%d')
     except ValueError:
         return datetime.now().date()
+
+#Define message for reaching a password-protected page
+def home():
+    return 'This is a protected page!'
+
+#Setup the simple password protection for the website
+@app.before_request
+def check_auth():
+    auth = request.authorization
+    if not auth or not (auth.username == 'username' and auth.password == 'password'):
+        return authenticate()
+        
+def authenticate():
+    return Response('Please authenticate.', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
 
 #Route for the index homepage (Show the reservation planner)
 @app.route('/', methods=['GET'])
@@ -121,20 +142,6 @@ def display_schedule(date=None):
     #Display the schedule.html with the indicated variables passed to it
     return render_template('schedule.html', num_lanes=num_lanes, time_slots=time_slots, time_slots_str=time_slots_str, lane_reservations=lane_reservations, requested_date=requested_date, prev_date=prev_date, next_date=next_date, lane_defective_states=lane_defective_states, translations_selected=translations_selected, translated_day=translated_day, translated_month=translated_month)
 
-#Define message for reaching a password-protected page
-def home():
-    return 'This is a protected page!'
-
-#Setup the simple password protection for the website
-@app.before_request
-def check_auth():
-    auth = request.authorization
-    if not auth or not (auth.username == 'username' and auth.password == 'password'):
-        return authenticate()
-        
-def authenticate():
-    return Response('Please authenticate.', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
-
 #Route for the page of adding a reservation
 @app.route('/add_data')
 def add_data():
@@ -152,6 +159,7 @@ def submit_data():
     date = datetime.strptime(request.form.get('date'), '%d-%b-%Y').date()
     start_time = datetime.strptime(request.form.get('start_time'), '%H:%M').time()
     duration = float(request.form.get('duration'))
+    duration_slots = int(duration * 60 / 30)
     
     if request.form.get('players') != '':    
         players = int(request.form.get('players'))
@@ -163,7 +171,107 @@ def submit_data():
     lanes_string = ','.join(selected_lanes)
     kids_playing = 1 if 'kids' in request.form else 0
     special_event = request.form.get('special_event')
+    
+    #Setup the dictionary for the new_reservation
+    new_reservation = {lane: {time_slot: None for time_slot in time_slots} for lane in range(num_lanes)}
+    #Get the reservations for the selected date from the database
+    reservations = Reservation.query.filter_by(date=date).all()
+    lane_reservations = {lane: {time_slot: None for time_slot in time_slots} for lane in range(num_lanes)}
+    
+    #Store the reservation data from the database in a dictionary for comparison
+    for reservation in reservations:
+        res_lanes = reservation.lanes.split(',')  # Split the stored lane string into individual lanes
+        res_start_time = reservation.start_time.strftime('%H:%M')
+        res_duration_slots = int(reservation.duration * 60 / 30)
+        for lane in res_lanes:  # Iterate through each lane in the reservation
+            lane = int(lane) - 1 # Convert lane to integer and adjust index
+            for i, time_slot in enumerate(time_slots):
+                time_slot_formatted = "%02d:%02d" % ((time_slot // 60) % 24, time_slot % 60)
+                if time_slot_formatted == res_start_time:
+                    lane_reservations[lane][time_slot] = {
+                        'id': reservation.id,
+                    }
+                    #Mark the succeeding slots after the start time for a reservation as "occupied"
+                    for j in range(1, res_duration_slots):
+                        lane_reservations[lane][time_slots[i + j]] = 'occupied'
+ 
+    # Store reservation data of the new reservation in a dictionary for comparison with the one from the database
+    for lane in selected_lanes:
+        lane = int(lane) - 1  # Adjust lane index
+        for i, time_slot in enumerate(time_slots):
+            time_slot_formatted = "%02d:%02d" % ((time_slot // 60) % 24, time_slot % 60)
+            if time_slot_formatted == start_time.strftime('%H:%M'):
+                new_reservation[lane][time_slot] = {
+                    'name': name,
+                }
+                
+                #Mark the succeeding slots after the start time for a reservation as "occupied"
+                for j in range(1, duration_slots):
+                    new_reservation[lane][time_slots[i + j]] = 'occupied'
+	
+    # Function to check if a new reservation overlaps with existing reservations
+    overlapping_reservation= False
+    for lane, slots in new_reservation.items():
+        for time_slot, reservation_data in slots.items():
+            # Check if the time_slot is not None in both dictionaries
+            if reservation_data is not None and lane_reservations[lane][time_slot] is not None:
+                overlapping_reservation = True
+                break  # Exit the loop if an overlap is found
 
+    # Check if any overlapping reservation was found
+    if overlapping_reservation:
+        return render_template('recheck_add_data.html', overlapping_reservation=overlapping_reservation, lanes=range(1, num_lanes + 1), translations_selected=translations_selected, name=name, date=date,start_time=start_time,duration=duration,players=players,lanes_selected=lanes_string,kids=kids_playing,specialevent=special_event)
+    
+    # Check for defective lanes
+    defective_lanes = DefectiveLane.query.filter_by(is_defective=True).all()
+    defective_lane_numbers = [defective_lane.lane_number for defective_lane in defective_lanes]
+    selected_lanes = request.form.getlist('lanes[]')   
+
+    is_defective_lane = any(int(lane) in defective_lane_numbers for lane in selected_lanes)
+    
+    #Check for kids booked on a lane without bumpers
+    is_non_bumper_lane_with_kids = any(int(lane) in non_bumper_lanes for lane in selected_lanes) and kids_playing == 1
+    
+    #Display the reservation again for changes or confirmation if a discrepancy is found.
+    if is_defective_lane or is_non_bumper_lane_with_kids:
+        return render_template('recheck_add_data.html', is_defective_lane=is_defective_lane, no_bumper_lane=is_non_bumper_lane_with_kids, lanes=range(1, num_lanes + 1), translations_selected=translations_selected, name=name, date=date,start_time=start_time,duration=duration,players=players,lanes_selected=lanes_string,kids=kids_playing,specialevent=special_event)
+    
+    # Save the reservation to the database
+    new_reservation = Reservation(
+        name=name,
+        date=date,
+        start_time=start_time,
+        duration=duration,
+        players=players,
+        kids=kids_playing,
+        lanes=lanes_string,
+        specialevent=special_event
+    )
+    db.session.add(new_reservation)
+    db.session.commit()
+	
+	# Re-route to show the schedule after submitting a reservation
+    return redirect(url_for('display_schedule'))
+	
+@app.route('/confirm_adding_reservation', methods=['POST'])
+def confirm_adding_reservation():
+	#obtain and derive the values to be stored in the database
+    name = request.form.get('name')
+    date = datetime.strptime(request.form.get('date'), '%d-%b-%Y').date()
+    start_time = datetime.strptime(request.form.get('start_time'), '%H:%M').time()
+    duration = float(request.form.get('duration'))
+    
+    if request.form.get('players') != '':    
+        players = int(request.form.get('players'))
+    else:
+        players = None
+        
+    selected_lanes = request.form.getlist('lanes[]')
+
+    lanes_string = ','.join(selected_lanes)
+    kids_playing = 1 if 'kids' in request.form else 0
+    special_event = request.form.get('special_event')
+	
     # Save the reservation to the database
     new_reservation = Reservation(
         name=name,
@@ -199,8 +307,7 @@ def update_data():
 def update_reservation():
     action = request.form.get('action')
     reservation_id = request.form.get('reservation_id')
-    # Query the database to get the reservation entry
-    reservation = Reservation.query.filter_by(id=reservation_id).first()
+
    
     #Action if Update button is pressed
     if action == 'Update':
@@ -211,6 +318,7 @@ def update_reservation():
         date = datetime.strptime(request.form.get('date'), '%d-%b-%Y').date()
         start_time = datetime.strptime(request.form.get('start_time'), '%H:%M').time()
         duration = float(request.form.get('duration'))
+        duration_slots = int(duration * 60 / 30)
         
         if request.form.get('players') != '':    
             players = int(request.form.get('players'))
@@ -223,6 +331,74 @@ def update_reservation():
         kids_playing = 1 if 'kids' in request.form else 0
         special_event = request.form.get('special_event')
         
+        #Setup the dictionary for the new_reservation
+        updated_reservation = {lane: {time_slot: None for time_slot in time_slots} for lane in range(num_lanes)}
+        #Get the reservations for the selected date from the database
+        reservations = Reservation.query.filter_by(date=date).all()
+        lane_reservations = {lane: {time_slot: None for time_slot in time_slots} for lane in range(num_lanes)}
+    
+        #Store the reservation data from the database in a dictionary for comparison
+        for reservation in reservations:
+            res_lanes = reservation.lanes.split(',')  # Split the stored lane string into individual lanes
+            res_start_time = reservation.start_time.strftime('%H:%M')
+            res_duration_slots = int(reservation.duration * 60 / 30)
+            for lane in res_lanes:  # Iterate through each lane in the reservation
+                lane = int(lane) - 1 # Convert lane to integer and adjust index
+                for i, time_slot in enumerate(time_slots):
+                    time_slot_formatted = "%02d:%02d" % ((time_slot // 60) % 24, time_slot % 60)
+                    if time_slot_formatted == res_start_time:
+                        lane_reservations[lane][time_slot] = {
+                            'id': reservation.id,
+                        }
+                        #Mark the succeeding slots after the start time for a reservation as "occupied"
+                        for j in range(1, res_duration_slots):
+                            lane_reservations[lane][time_slots[i + j]] = 'occupied'
+ 
+        # Store reservation data of the new reservation in a dictionary for comparison with the one from the database
+        for lane in selected_lanes:
+            lane = int(lane) - 1  # Adjust lane index
+            for i, time_slot in enumerate(time_slots):
+                time_slot_formatted = "%02d:%02d" % ((time_slot // 60) % 24, time_slot % 60)
+                if time_slot_formatted == start_time.strftime('%H:%M'):
+                    updated_reservation[lane][time_slot] = {
+                        'id': int(reservation_id),
+                    }
+                
+                    #Mark the succeeding slots after the start time for a reservation as "occupied"
+                    for j in range(1, duration_slots):
+                        updated_reservation[lane][time_slots[i + j]] = 'occupied'
+	
+        # Function to check if a new reservation overlaps with existing reservations
+        overlapping_reservation= False
+        for lane, slots in updated_reservation.items():
+            for time_slot, reservation_data in slots.items():
+                # Check if the time_slot is not None in both dictionaries
+                if reservation_data is not None and lane_reservations[lane][time_slot] is not None:
+                    if reservation_data != lane_reservations[lane][time_slot]:
+                    #if the IDs match, it is fine since the updated reservation is overlapping with itself
+                        overlapping_reservation = True
+                        break  # Exit the loop if an overlap is found
+
+        # Check if any overlapping reservation was found
+        if overlapping_reservation:
+            return render_template('recheck_update_data.html', overlapping_reservation=overlapping_reservation, lanes=range(1, num_lanes + 1), translations_selected=translations_selected, id=reservation_id,name=name, date=date,start_time=start_time,duration=duration,players=players,lanes_selected=lanes_string,kids=kids_playing,specialevent=special_event)
+        
+        # Check for defective lanes
+        defective_lanes = DefectiveLane.query.filter_by(is_defective=True).all()
+        defective_lane_numbers = [defective_lane.lane_number for defective_lane in defective_lanes]
+        selected_lanes = request.form.getlist('lanes[]')
+
+        is_defective_lane = any(int(lane) in defective_lane_numbers for lane in selected_lanes)
+        
+        #Check for kids booked on a lane without bumpers
+        is_non_bumper_lane_with_kids = any(int(lane) in non_bumper_lanes for lane in selected_lanes) and kids_playing == 1
+     
+		#Display the reservation again for changes or confirmation if a discrepancy is found.
+        if is_defective_lane or is_non_bumper_lane_with_kids:
+            return render_template('recheck_update_data.html', is_defective_lane=is_defective_lane, no_bumper_lane=is_non_bumper_lane_with_kids, lanes=range(1, num_lanes + 1), translations_selected=translations_selected, id=reservation_id,name=name, date=date,start_time=start_time,duration=duration,players=players,lanes_selected=lanes_string,kids=kids_playing,specialevent=special_event)
+ 
+        # Query the database to get the reservation entry
+        reservation = Reservation.query.filter_by(id=reservation_id).first()
         # Update the reservation entry with the new data
         reservation.name = name
         reservation.date = date
@@ -241,8 +417,9 @@ def update_reservation():
     
     #Action if Delete button is pressed
     elif action == 'Delete':
-
-        print(reservation)
+		
+        # Query the database to get the reservation entry
+        reservation = Reservation.query.filter_by(id=reservation_id).first()
         if reservation:
             db.session.delete(reservation)
             db.session.commit()
@@ -251,6 +428,49 @@ def update_reservation():
             return "Reservation not found", 404
             
     return "Invalid action or reservation not found", 404
+
+#Route for updating or deleting reservation data in the database
+@app.route('/confirm_updating_reservation', methods=['POST'])
+def confirm_updating_reservation():
+    reservation_id = request.form.get('reservation_id')
+    # Query the database to get the reservation entry
+    reservation = Reservation.query.filter_by(id=reservation_id).first()
+   
+
+    # Extract updated reservation data from the form
+    kids_playing = 1 if 'kids' in request.form else 0
+
+    name = request.form.get('name')
+    date = datetime.strptime(request.form.get('date'), '%d-%b-%Y').date()
+    start_time = datetime.strptime(request.form.get('start_time'), '%H:%M').time()
+    duration = float(request.form.get('duration'))
+    
+    if request.form.get('players') != '':    
+        players = int(request.form.get('players'))
+    else:
+        players = None
+        
+    selected_lanes = request.form.getlist('lanes[]')
+
+    lanes_string = ','.join(selected_lanes)
+    kids_playing = 1 if 'kids' in request.form else 0
+    special_event = request.form.get('special_event')
+    
+    # Update the reservation entry with the new data
+    reservation.name = name
+    reservation.date = date
+    reservation.start_time = start_time
+    reservation.duration = duration
+    reservation.players = players
+    reservation.kids = kids_playing
+    reservation.lanes = lanes_string
+    reservation.specialevent = special_event
+
+    # Commit the changes to the database
+    db.session.commit()
+ 
+    # Redirect to the schedule page or any other page after successful update
+    return redirect(url_for('display_schedule'))
 
 #Route for updating an "OK" or "Defective" Lane status in the database
 @app.route('/update_defective_state', methods=['POST'])
