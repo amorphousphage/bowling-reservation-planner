@@ -11,7 +11,7 @@
 </head>
 <body class="update-data">
     <h1>{{ translations_selected.get("Update Bowling Data") }}</h1>
-    <form class="inlineform" method="POST" action="/update_reservation">
+    <form class="inlineform" method="POST" id="reservationForm">
         <label for="date">{{ translations_selected.get("Date") }}:</label>
         <input type="text" id="date" name="date" value="{{ reservation.date.strftime('%d-%b-%Y') }}" required>
         
@@ -65,16 +65,32 @@
 			});
 		</script>
         <script>
-	// listener for the type="submit" button to be pushed, which allows for validating the form
-	document.getElementById('reservationForm').addEventListener("submit",updateReservation);
+	//get translations
+	var translations = {
+	NoLaneSelected: "{{ translations_selected.get('Please select at least one lane.') }}",
+	}
+	// listener for the type="submit" button to be pushed, which allows for validating the form and first check that at least one lane was selected
+	document.getElementById('reservationForm').addEventListener('submit', function(event) {
+    var selectedLanes = document.querySelectorAll('input[name="lanes[]"]:checked');
+    if (selectedLanes.length === 0) {
+        event.preventDefault(); // Prevent form submission
+        alert(translations.NoLaneSelected);
+    } else {
+        // If lanes are selected, proceed with the reservation
+        updateReservation(); // Call the function to submit the form
+    }
+});
 	// function for the Update button
     function updateReservation() {
         document.getElementById('formAction').value = 'Update';
+        document.getElementById('reservationForm').action = '/update_reservation';
         document.getElementById('reservationForm').submit();
     }
 	// function for the Delete button
     function deleteReservation() {
+		event.preventDefault();
         document.getElementById('formAction').value = 'Delete';
+        document.getElementById('reservationForm').action = '/update_reservation';
         document.getElementById('reservationForm').submit();
     }
     // function for the back button

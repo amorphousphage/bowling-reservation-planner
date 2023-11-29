@@ -65,8 +65,24 @@
 			});
 		</script>
 		<script>
-	// listener for the type="submit" button to be pushed, which allows for validating the form		
-	document.getElementById('reservationForm').addEventListener("submit",updateReservation);
+	// get translations
+	    var translations = {
+		defectiveLaneConfirmation:  "{{ translations_selected.get('A selected lane is defective. Do you want to proceed?') }}",
+		bumperConfirmation:  "{{ translations_selected.get('Kids playing is indicated, but a selected lane does not have bumpers. Do you want to proceed?') }}",
+		OverlapError: "{{ translations_selected.get('There is an overlap with an existing reservation for this lane. Please update this reservation.') }}",
+		NoLaneSelected: "{{ translations_selected.get('Please select at least one lane.') }}"
+		}
+	// listener for the type="submit" button to be pushed, which allows for validating the form and first check that at least one lane was selected
+	document.getElementById('reservationForm').addEventListener('submit', function(event) {
+    var selectedLanes = document.querySelectorAll('input[name="lanes[]"]:checked');
+    if (selectedLanes.length === 0) {
+        event.preventDefault(); // Prevent form submission
+        alert(translations.NoLaneSelected);
+    } else {
+        // If lanes are selected, proceed with the reservation
+        updateReservation(); // Call the function to submit the form
+    }
+	});
 	// function for the Update button
     function updateReservation() {
         document.getElementById('formAction').value = 'Update';
@@ -75,6 +91,7 @@
     }
 	// function for the Delete button
     function deleteReservation() {
+		event.preventDefault();
         document.getElementById('formAction').value = 'Delete';
         document.getElementById('reservationForm').action = '/update_reservation';
         document.getElementById('reservationForm').submit();
@@ -89,11 +106,7 @@
     var isDefectiveLane = {{ 'true' if is_defective_lane else 'false' }};
     var noBumperLane = {{ 'true' if no_bumper_lane else 'false' }};
     var Overlap = {{ 'true' if overlapping_reservation else 'false' }};
-    var translations = {
-		defectiveLaneConfirmation:  "{{ translations_selected.get('A selected lane is defective. Do you want to proceed?') }}",
-		bumperConfirmation:  "{{ translations_selected.get('Kids playing is indicated, but a selected lane does not have bumpers. Do you want to proceed?') }}",
-		OverlapError: "{{ translations_selected.get('There is an overlap with an existing reservation for this lane. Please update this reservation.') }}"
-		}
+
 	//function for showing and handling the defective lane confirmation
     function showDefectiveLaneConfirmation() {
         defectiveconfirmation = confirm(translations.defectiveLaneConfirmation);

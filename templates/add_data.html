@@ -61,23 +61,35 @@
 		<button class="backbutton" onclick="goBack(event)">{{ translations_selected.get("Back") }}</button>
     </form>
     <script>
-	// listener for the type="submit" button to be pushed, which allows for validating the form
-	document.getElementById('reservationForm').addEventListener("submit",addReservation);
-	// function for the New Reservation button
-     function addReservation() {
-			document.getElementById('reservationForm').action = '/submit_data';
-			document.getElementById('reservationForm').submit();
-     }
+	//get translations
+		var translations = {
+		NoName:  "{{ translations_selected.get('[Name unknown]') }}",
+		spontaneousName:  "{{ translations_selected.get('[spontaneous]') }}",
+		NoLaneSelected: "{{ translations_selected.get('Please select at least one lane.') }}",
+		}
+	// listener for the type="submit" button to be pushed, which allows for validating the form and first check that at least one lane was selected
+	document.getElementById('reservationForm').addEventListener('submit', function(event) {
+    var selectedLanes = document.querySelectorAll('input[name="lanes[]"]:checked');
+    if (selectedLanes.length === 0) {
+        event.preventDefault(); // Prevent form submission
+        alert(translations.NoLaneSelected);
+    } else {
+        // If lanes are selected, proceed with the reservation
+        addReservation(); // Call the function to submit the form
+    }
+	});
+
+	// Function to submit the reservation
+	function addReservation() {
+    document.getElementById('reservationForm').action = '/submit_data';
+    document.getElementById('reservationForm').submit();
+	}
     // function for the back button
     function goBack(event) {
 		event.preventDefault();
 		window.location.href = '/';
 		}
 	
-	var translations = {
-		NoName:  "{{ translations_selected.get('[Name unknown]') }}",
-		spontaneousName:  "{{ translations_selected.get('[spontaneous]') }}",
-		}
 	// listener for the "No Name" button
     document.getElementById('no_name_button').addEventListener('click', function() {
         // Set the name field value to "No Name"
