@@ -60,7 +60,7 @@
         <!-- Generate the Lane number title in the left column plus the "OK" and "Defective" buttons-->
         {% for lane in range(num_lanes) %}
             <tr data-lane="{{ lane + 1}}">
-				<td><div>
+				<td class="laneheader"><div>
 					<strong>{{ translations_selected.get("Lane") }} {{ lane + 1 }}</strong><br>
 					<label class="ok-label">
 						<input type="radio" id="lane_status_{{ lane + 1 }}_ok" name="lane_status_{{ lane + 1 }}" value="ok" {% if not lane_defective_states[lane] %}checked{% endif %}> {{ translations_selected.get("OK") }}
@@ -104,8 +104,9 @@
     
 <script>
 	// function for the datepicker
+	var lang = '{{ preferred_language }}';
     $(function() {
-		$.datepicker.setDefaults($.datepicker.regional['de']);
+		$.datepicker.setDefaults($.datepicker.regional[lang]);
         $("#datepicker").datepicker({
             dateFormat: 'yy-mm-dd',
             changeMonth: true,

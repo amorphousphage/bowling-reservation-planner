@@ -6,6 +6,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/i18n/jquery-ui-i18n.min.js"></script>
 	<link rel="stylesheet" href="../static/styles.css">
 </head>
 <body class="add-data">
@@ -15,7 +16,9 @@
         <input type="text" id="date" name="date" value="{{ today }}" required>
         <script>
 			// function for the datepicker
+			var lang = '{{ preferred_language }}';
 			$(function() {
+				$.datepicker.setDefaults($.datepicker.regional[lang]);
 				$("#date").datepicker({
 					dateFormat: 'dd-M-yy',
 					changeMonth: true,

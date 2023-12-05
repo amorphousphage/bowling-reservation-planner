@@ -17,6 +17,7 @@ td, th {
 
 th {
     background-color: #0087ff;
+    font-size: 25px;
 }
 
 td {
@@ -26,7 +27,10 @@ td {
 		td div {
 			width: 200px; overflow: hidden;
 		}
-		
+td.laneheader {
+	font-size: 18px;
+}
+	
 td.reservation {
     background-color: #00008f;
     color: white;

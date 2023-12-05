@@ -44,9 +44,44 @@ def select_language(language):
     else:
         return translations_en, days_en, months_en
 
-#Set the appriopriate translation for the webpage
-preferred_language = "de"
+#Set the appriopriate language for the webpage
+preferred_language = "en"
 translations_selected, days_selected, months_selected = select_language(preferred_language)
+
+#Define the date converter to convert short format of months to English for storage
+def parse_date_custom(date_str, lang):
+    # Get the month dictionary based on the language
+    lang_months = month_dict.get(lang, {})
+
+    # Replace month names with English abbreviations
+    for locallanguage_month, english_month in lang_months.items():
+
+        date_str = date_str.replace(locallanguage_month, english_month)
+
+    try:
+        parsed_date = datetime.strptime(date_str, '%d-%b-%Y').date()
+        return parsed_date
+    except ValueError:
+        # Handle the case where the date format doesn't match
+        return None
+
+#Define the date converter to convert short format of months from English to preferred_language for display
+def convert_to_local_date(date_string, language):
+
+    # Get the language-specific month dictionary	
+    language_months = month_dict.get(language, {})
+
+    # Reverse the month dictionary for lookup by English month abbreviation
+    reversed_month_dict = {v: k for k, v in language_months.items()}
+
+    # Split the date string into day, month abbreviation, and year
+    day, month_abbr, year = date_string.split('-')
+
+    # Translate the month abbreviation to the local language
+    translated_month = reversed_month_dict.get(month_abbr, month_abbr)
+
+    # Return the date in the local format
+    return f"{day}-{translated_month}-{year}"
 
 #
 # SET UP YOUR CENTER SETTINGS BELOW
@@ -140,23 +175,24 @@ def display_schedule(date=None):
         lane_defective_states[lane] = defective_lane.is_defective if defective_lane else False
     
     #Display the schedule.html with the indicated variables passed to it
-    return render_template('schedule.html', num_lanes=num_lanes, time_slots=time_slots, time_slots_str=time_slots_str, lane_reservations=lane_reservations, requested_date=requested_date, prev_date=prev_date, next_date=next_date, lane_defective_states=lane_defective_states, translations_selected=translations_selected, translated_day=translated_day, translated_month=translated_month)
+    return render_template('schedule.html', num_lanes=num_lanes, time_slots=time_slots, time_slots_str=time_slots_str, lane_reservations=lane_reservations, requested_date=requested_date, prev_date=prev_date, next_date=next_date, lane_defective_states=lane_defective_states, translations_selected=translations_selected, translated_day=translated_day, translated_month=translated_month, preferred_language=preferred_language)
 
 #Route for the page of adding a reservation
 @app.route('/add_data')
 def add_data():
-	#Format the date to auto-populate in the new reservation
-    today = datetime.today().strftime('%d-%b-%Y')
+	#Format the date to auto-populate in the new reservation in the selected language
+    today = convert_to_local_date(datetime.today().strftime('%d-%b-%Y'), preferred_language)
     
     #Display the add_data.html with the indicated variables passed to it
-    return render_template('add_data.html', num_lanes=num_lanes, lanes=range(1, num_lanes + 1), today=today, translations_selected=translations_selected)
+    return render_template('add_data.html', num_lanes=num_lanes, lanes=range(1, num_lanes + 1), today=today, translations_selected=translations_selected, preferred_language=preferred_language)
 
 #Route for the page of submitting reservation data into the database
 @app.route('/submit_data', methods=['POST'])
 def submit_data():
 	#obtain and derive the values to be stored in the database
+
     name = request.form.get('name')
-    date = datetime.strptime(request.form.get('date'), '%d-%b-%Y').date()
+    date = parse_date_custom(request.form.get('date'),preferred_language)
     start_time = datetime.strptime(request.form.get('start_time'), '%H:%M').time()
     duration = float(request.form.get('duration'))
     duration_slots = int(duration * 60 / 30)
@@ -220,7 +256,7 @@ def submit_data():
 
     # Check if any overlapping reservation was found
     if overlapping_reservation:
-        return render_template('recheck_add_data.html', overlapping_reservation=overlapping_reservation, lanes=range(1, num_lanes + 1), translations_selected=translations_selected, name=name, date=date,start_time=start_time,duration=duration,players=players,lanes_selected=lanes_string,kids=kids_playing,specialevent=special_event)
+        return render_template('recheck_add_data.html', overlapping_reservation=overlapping_reservation, lanes=range(1, num_lanes + 1), translations_selected=translations_selected, name=name, date=convert_to_local_date(date,preferred_language),start_time=start_time,duration=duration,players=players,lanes_selected=lanes_string,kids=kids_playing,specialevent=special_event,preferred_language=preferred_language)
     
     # Check for defective lanes
     defective_lanes = DefectiveLane.query.filter_by(is_defective=True).all()
@@ -234,7 +270,7 @@ def submit_data():
     
     #Display the reservation again for changes or confirmation if a discrepancy is found.
     if is_defective_lane or is_non_bumper_lane_with_kids:
-        return render_template('recheck_add_data.html', is_defective_lane=is_defective_lane, no_bumper_lane=is_non_bumper_lane_with_kids, lanes=range(1, num_lanes + 1), translations_selected=translations_selected, name=name, date=date,start_time=start_time,duration=duration,players=players,lanes_selected=lanes_string,kids=kids_playing,specialevent=special_event)
+        return render_template('recheck_add_data.html', is_defective_lane=is_defective_lane, no_bumper_lane=is_non_bumper_lane_with_kids, lanes=range(1, num_lanes + 1), translations_selected=translations_selected, name=name, date=request.form.get('date'),start_time=start_time,duration=duration,players=players,lanes_selected=lanes_string,kids=kids_playing,specialevent=special_event, preferred_language=preferred_language)
     
     # Save the reservation to the database
     new_reservation = Reservation(
@@ -257,7 +293,7 @@ def submit_data():
 def confirm_adding_reservation():
 	#obtain and derive the values to be stored in the database
     name = request.form.get('name')
-    date = datetime.strptime(request.form.get('date'), '%d-%b-%Y').date()
+    date = parse_date_custom(request.form.get('date'),preferred_language)
     start_time = datetime.strptime(request.form.get('start_time'), '%H:%M').time()
     duration = float(request.form.get('duration'))
     
@@ -298,7 +334,8 @@ def update_data():
     
     #Populate update_data.html with the data from the database
     if reservation:
-        return render_template('update_data.html', reservation=reservation, lanes=range(1, num_lanes + 1), translations_selected=translations_selected)
+        date = convert_to_local_date(reservation.date.strftime('%d-%b-%Y'), preferred_language)
+        return render_template('update_data.html', reservation=reservation, lanes=range(1, num_lanes + 1), translations_selected=translations_selected, date=date, preferred_language=preferred_language)
     else:
         return "Reservation not found", 404
 
@@ -315,7 +352,7 @@ def update_reservation():
         kids_playing = 1 if 'kids' in request.form else 0
     
         name = request.form.get('name')
-        date = datetime.strptime(request.form.get('date'), '%d-%b-%Y').date()
+        date = parse_date_custom(request.form.get('date'),preferred_language)
         start_time = datetime.strptime(request.form.get('start_time'), '%H:%M').time()
         duration = float(request.form.get('duration'))
         duration_slots = int(duration * 60 / 30)
@@ -381,7 +418,7 @@ def update_reservation():
 
         # Check if any overlapping reservation was found
         if overlapping_reservation:
-            return render_template('recheck_update_data.html', overlapping_reservation=overlapping_reservation, lanes=range(1, num_lanes + 1), translations_selected=translations_selected, id=reservation_id,name=name, date=date,start_time=start_time,duration=duration,players=players,lanes_selected=lanes_string,kids=kids_playing,specialevent=special_event)
+            return render_template('recheck_update_data.html', overlapping_reservation=overlapping_reservation, lanes=range(1, num_lanes + 1), translations_selected=translations_selected, id=reservation_id,name=name, date=request.form.get('date'),start_time=start_time,duration=duration,players=players,lanes_selected=lanes_string,kids=kids_playing,specialevent=special_event, preferred_language=preferred_language)
         
         # Check for defective lanes
         defective_lanes = DefectiveLane.query.filter_by(is_defective=True).all()
@@ -395,7 +432,7 @@ def update_reservation():
      
 		#Display the reservation again for changes or confirmation if a discrepancy is found.
         if is_defective_lane or is_non_bumper_lane_with_kids:
-            return render_template('recheck_update_data.html', is_defective_lane=is_defective_lane, no_bumper_lane=is_non_bumper_lane_with_kids, lanes=range(1, num_lanes + 1), translations_selected=translations_selected, id=reservation_id,name=name, date=date,start_time=start_time,duration=duration,players=players,lanes_selected=lanes_string,kids=kids_playing,specialevent=special_event)
+            return render_template('recheck_update_data.html', is_defective_lane=is_defective_lane, no_bumper_lane=is_non_bumper_lane_with_kids, lanes=range(1, num_lanes + 1), translations_selected=translations_selected, id=reservation_id,name=name, date=request.form.get('date'),start_time=start_time,duration=duration,players=players,lanes_selected=lanes_string,kids=kids_playing,specialevent=special_event, preferred_language=preferred_language)
  
         # Query the database to get the reservation entry
         reservation = Reservation.query.filter_by(id=reservation_id).first()
@@ -441,7 +478,7 @@ def confirm_updating_reservation():
     kids_playing = 1 if 'kids' in request.form else 0
 
     name = request.form.get('name')
-    date = datetime.strptime(request.form.get('date'), '%d-%b-%Y').date()
+    date = parse_date_custom(request.form.get('date'),preferred_language)
     start_time = datetime.strptime(request.form.get('start_time'), '%H:%M').time()
     duration = float(request.form.get('duration'))
     
