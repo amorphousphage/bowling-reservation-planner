@@ -8,7 +8,7 @@ from translations import *
 
 #Setup app name and database connection
 app = Flask(__name__, template_folder='templates')  # Set the template folder
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:password@localhost/ChristianTeppich$bowlingreservation'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:password@localhost/databasename'
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
