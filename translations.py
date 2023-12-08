@@ -13,6 +13,9 @@ translations_de= {
     "No":"Nein",
     "Kid Birthday Variant 1": "Geburtstag Variante 1",
     "Kid Birthday Variant 2": "Geburtstag Variante 2",
+    "Company Event": "Firmenanlass",
+    "Club Event": "Vereinsanlass",
+    "Bowling Club":"Bowling Club",
     "Add Reservation": "Neue Reservation",
     "Save New Reservation": "Reservation abschliessen",
     "Back":"Zurück",
@@ -32,7 +35,9 @@ translations_de= {
 	"There is an overlap with an existing reservation for this lane. Please update this reservation.": "Diese Reservation überschneidet sich mit einer bereits Bestehenden. Bitte diese Reservation updaten",
 	"[Name unknown]":"[Name unbekannt]",
 	"[spontaneous]":"[spontan]",
-	"Please select at least one lane.":"Es wurde keine Bahn ausgewählt. Bitte mindestens eine Bahn auswählen"
+	"Please select at least one lane.":"Es wurde keine Bahn ausgewählt. Bitte mindestens eine Bahn auswählen",
+	"Daily Comment":"Kommentar für heute",
+	"Update Comment":"Kommentar aktualisieren"
 }
 days_de = {
     'Monday': 'Montag',
@@ -73,6 +78,9 @@ translations_en= {
     "No":"No",
     "Kid Birthday Variant 1": "Birthday variant 1",
     "Kid Birthday Variant 2": "Birthday variant 2",
+    "Company Event": "Company event",
+    "Club Event": "Club event",
+    "Bowling Club":"Bowling Club",
     "Add Reservation": "New reservation",
     "Save New Reservation": "Save reservation",
     "Back":"Back",
@@ -91,7 +99,9 @@ translations_en= {
 	"Kids playing is indicated, but a selected lane does not have bumpers. Do you want to proceed?": "Kids are indicated to play, but at least one selected lane does not have bumpers. Do you want to proceed?",
 	"[Name unknown]":"[Name unknown]",
 	"[spontaneous]":"[spontaneous]",
-	"Please select at least one lane.":"No Lane was selected. Please select at least one lane."
+	"Please select at least one lane.":"No Lane was selected. Please select at least one lane.",
+	"Daily Comment":"Today's comment",
+	"Update Comment":"Update comment"
 }
 
 days_en = {
@@ -133,6 +143,9 @@ translations_it = {
     "No": "No",
     "Kid Birthday Variant 1": "Variante compleanno 1",
     "Kid Birthday Variant 2": "Variante compleanno 2",
+    "Company Event": "Evento aziendale",
+    "Club Event": "Evento del club",
+    "Bowling Club":"Club di bowling",
     "Add Reservation": "Nuova prenotazione",
     "Save New Reservation": "Salva prenotazione",
     "Back": "Indietro",
@@ -151,7 +164,9 @@ translations_it = {
     "Kids playing is indicated, but a selected lane does not have bumpers. Do you want to proceed?": "Si indica che i bambini stanno giocando, ma almeno una corsia selezionata non ha le protezioni laterali. Desideri procedere?",
     "[Name unknown]": "[Nome sconosciuto]",
     "[spontaneous]": "[spontaneo]",
-    "Please select at least one lane.": "Si prega di selezionare almeno una corsia."
+    "Please select at least one lane.": "Si prega di selezionare almeno una corsia.",
+    "Daily Comment":"Il commento di oggi",
+	"Update Comment":"aggiornare il commento"
 }
 
 days_it = {
@@ -193,6 +208,9 @@ translations_fr = {
     "No": "Non",
     "Kid Birthday Variant 1": "Variante anniversaire 1",
     "Kid Birthday Variant 2": "Variante anniversaire 2",
+    "Company Event": "Événement d'entreprise",
+    "Club Event": "Événement de l'association",
+    "Bowling Club":"Club de bowling",
     "Add Reservation": "Nouvelle réservation",
     "Save New Reservation": "Enregistrer la réservation",
     "Back": "Retour",
@@ -211,7 +229,9 @@ translations_fr = {
     "Kids playing is indicated, but a selected lane does not have bumpers. Do you want to proceed?": "Il est indiqué que les enfants jouent, mais au moins une piste sélectionnée n'a pas de pare-chocs. Voulez-vous continuer ?",
     "[Name unknown]": "[Nom inconnu]",
     "[spontaneous]": "[spontané]",
-    "Please select at least one lane.": "Veuillez sélectionner au moins une piste."
+    "Please select at least one lane.": "Veuillez sélectionner au moins une piste.",
+    "Daily Comment":"Commentaire du jour",
+	"Update Comment":"mettre à jour le commentaire"
 }
 
 days_fr = {
@@ -253,6 +273,9 @@ translations_es = {
     "No": "No",
     "Kid Birthday Variant 1": "Variante cumpleaños 1",
     "Kid Birthday Variant 2": "Variante cumpleaños 2",
+    "Company Event": "Evento de empresa",
+    "Club Event": "Evento del club",
+    "Bowling Club":"Club de bolos",
     "Add Reservation": "Nueva reserva",
     "Save New Reservation": "Guardar reserva",
     "Back": "Atrás",
@@ -271,7 +294,9 @@ translations_es = {
     "Kids playing is indicated, but a selected lane does not have bumpers. Do you want to proceed?": "Se indica que hay niños jugando, pero al menos una pista seleccionada no tiene parachoques. ¿Desea proceder?",
     "[Name unknown]": "[Nombre desconocido]",
     "[spontaneous]": "[espontáneo]",
-    "Please select at least one lane.": "Por favor, selecciona al menos una pista."
+    "Please select at least one lane.": "Por favor, selecciona al menos una pista.",
+    "Daily Comment":"Comentario de hoy",
+	"Update Comment":"actualizar comentario"
 }
 
 days_es = {

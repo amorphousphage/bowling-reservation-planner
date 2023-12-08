@@ -59,6 +59,16 @@ black 13px
 	display: inline-block;
 }
 
+.dailycomment {
+	display: inline-block;
+	position: relative;
+	top:25px;
+}
+
+.dailycommenttext {
+	font-size: 25px;
+	margin-left:10px;
+}
 body {
 	background-image: url("../static/images/bg.png");
 	background-size: cover;
@@ -75,6 +85,18 @@ body {
 	border: none;
 	border-radius: 40px;
 }
+
+.dailycommentbutton {
+	margin-bottom: 20px;
+	background-color: #0087ff;
+	padding: 13px 18px;
+	font-size: 23px;
+	text-align: center;
+	text-decoration: none;
+	outline: none;
+	border: none;
+	border-radius: 20px;
+}	
 		
 .backbutton {
 	background-color: #0087ff;
@@ -170,7 +192,19 @@ body {
 	border: none;
 	border-radius: 20px;
 }
-		
+
+.dailycommentbutton {
+	margin-bottom: 20px;
+	background-color: #0087ff;
+	padding: 15px 20px;
+	font-size: 20px;
+	text-align: center;
+	text-decoration: none;
+	outline: none;
+	border: none;
+	border-radius: 20px;
+}		
+
 .backbutton {
 	background-color: #0087ff;
 	padding: 20px 30px;

@@ -43,8 +43,10 @@
         <label for="special_event">{{ translations_selected.get("Special Event") }}:</label>
 		<select id="special_event" name="special_event">
 			<option value="No" {% if reservation.specialevent == "No" %}selected{% endif %}>No</option>
-			<option value="{{ translations_selected.get("Kid Birthday Variant 1") }}" {% if reservation.specialevent == translations_selected.get("Kid Birthday Variant 1") %}selected{% endif %}>{{ translations_selected.get("Kid Birthday Variant 1") }}</option>
-			<option value="{{ translations_selected.get("Kid Birthday Variant 2") }}" {% if reservation.specialevent == translations_selected.get("Kid Birthday Variant 2") %}selected{% endif %}>{{ translations_selected.get("Kid Birthday Variant 2") }}</option>
+			{% for event in list_of_events %}
+			    <option value="{{ translations_selected.get(event) }}" {% if reservation.
+					specialevent == translations_selected.get(event) %}selected{% endif %}>{{ translations_selected.get(event) }}</option>
+		    {% endfor %}
 		</select><br><br>
 
 		<input type="hidden" id="reservation_id" name="reservation_id" value="{{ reservation.id }}">

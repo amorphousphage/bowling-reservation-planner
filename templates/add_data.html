@@ -45,8 +45,9 @@
         <label for="special_event">{{ translations_selected.get("Special Event") }}:</label>
         <select id="special_event" name="special_event">
             <option value="No" selected>{{translations_selected.get("No")}}</option>
-            <option value="{{ translations_selected.get("Kid Birthday Variant 1") }}">{{ translations_selected.get("Kid Birthday Variant 1") }}</option>
-            <option value="{{ translations_selected.get("Kid Birthday Variant 2") }}">{{ translations_selected.get("Kid Birthday Variant 2") }}</option>
+            {% for event in list_of_events %}
+				<option value="{{ translations_selected.get(event) }}">{{ translations_selected.get(event) }}</option>
+            {% endfor %}
         </select><br><br>
 		<button class="addupdatereservationbutton" type="submit">{{ translations_selected.get("Save New Reservation") }}</button>
 		<button class="backbutton" onclick="goBack(event)">{{ translations_selected.get("Back") }}</button>

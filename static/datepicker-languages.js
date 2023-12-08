@@ -8,7 +8,7 @@ function setEnglishDatepicker() {
         showMonthAfterYear: false,
         yearSuffix: "",
         weekHeader: "W",
-        dateFormat: 'yy-mm-dd',
+        dateFormat: 'dd-M-yy',
         changeMonth: true,
         changeYear: true,
     });
@@ -24,7 +24,7 @@ function setGermanDatepicker() {
         firstDay: 1,
         yearSuffix: "",
         weekHeader: "W",
-        dateFormat: 'yy-mm-dd',
+        dateFormat: 'dd-M-yy',
         changeMonth: true,
         changeYear: true,
     });
@@ -40,7 +40,7 @@ function setFrenchDatepicker() {
         firstDay: 1,
         yearSuffix: "",
         weekHeader: "W",
-        dateFormat: 'yy-mm-dd',
+        dateFormat: 'dd-M-yy',
         changeMonth: true,
         changeYear: true,
     });
@@ -56,7 +56,7 @@ function setItalianDatepicker() {
         firstDay: 1,
         yearSuffix: "",
         weekHeader: "W",
-        dateFormat: 'yy-mm-dd',
+        dateFormat: 'dd-M-yy',
         changeMonth: true,
         changeYear: true,
     });
@@ -72,7 +72,7 @@ function setSpanishDatepicker() {
         firstDay: 1,
         yearSuffix: "",
         weekHeader: "W",
-        dateFormat: 'yy-mm-dd',
+        dateFormat: 'dd-M-yy',
         changeMonth: true,
         changeYear: true,
     });

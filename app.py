@@ -8,7 +8,7 @@ from translations import *
 
 #Setup app name and database connection
 app = Flask(__name__, template_folder='templates')  # Set the template folder
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:password@localhost/databasename'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://username:password@hostadress/databasename'
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
@@ -28,6 +28,13 @@ class Reservation(db.Model):
 class DefectiveLane(db.Model):
     lane_number = db.Column(db.Integer, primary_key=True, unique=True)
     is_defective = db.Column(db.Boolean, default=False)
+
+#Define daily comment table design
+class DailyComment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.DateTime)
+    dailycomment = db.Column(db.String(4000))
+
 
 #Select appropriate translation for the webpage
 def select_language(language):
@@ -92,6 +99,7 @@ num_lanes = 12
 non_bumper_lanes = [7,8,9,10,11,12]
 start_time = 12 * 60  # Start time in minutes (e.g. 12 for 12:00)
 end_time = 26 * 60  # End time in minutes (if the End Time is past midnight, write 24 + hour (e.g. 26 for 2 am, as it is 24+2))
+list_of_events = ["Kid Birthday Variant 1","Kid Birthday Variant 2","Company Event","Club Event","Bowling Club"] #Make sure that all events are entered here in English and that for all events translations exist in translations.py (even for translations to English)
 
 # --------------------------------------------------------------------------
 
@@ -173,9 +181,12 @@ def display_schedule(date=None):
     for lane in range(num_lanes):
         defective_lane = DefectiveLane.query.filter_by(lane_number=lane + 1).first()
         lane_defective_states[lane] = defective_lane.is_defective if defective_lane else False
-    
+        
+    #Get the daily comment if it exists
+    daily_comment_from_database = DailyComment.query.filter_by(date=requested_date).first()
+    dailycomment= daily_comment_from_database.dailycomment
     #Display the schedule.html with the indicated variables passed to it
-    return render_template('schedule.html', num_lanes=num_lanes, time_slots=time_slots, time_slots_str=time_slots_str, lane_reservations=lane_reservations, requested_date=requested_date, prev_date=prev_date, next_date=next_date, lane_defective_states=lane_defective_states, translations_selected=translations_selected, translated_day=translated_day, translated_month=translated_month, preferred_language=preferred_language)
+    return render_template('schedule.html', num_lanes=num_lanes, time_slots=time_slots, time_slots_str=time_slots_str, lane_reservations=lane_reservations, requested_date=requested_date, prev_date=prev_date, next_date=next_date, lane_defective_states=lane_defective_states, translations_selected=translations_selected, translated_day=translated_day, translated_month=translated_month, preferred_language=preferred_language, dailycomment=dailycomment)
 
 #Route for the page of adding a reservation
 @app.route('/add_data')
@@ -184,7 +195,7 @@ def add_data():
     today = convert_to_local_date(datetime.today().strftime('%d-%b-%Y'), preferred_language)
     
     #Display the add_data.html with the indicated variables passed to it
-    return render_template('add_data.html', num_lanes=num_lanes, lanes=range(1, num_lanes + 1), today=today, translations_selected=translations_selected, preferred_language=preferred_language)
+    return render_template('add_data.html', num_lanes=num_lanes, lanes=range(1, num_lanes + 1), today=today, translations_selected=translations_selected, preferred_language=preferred_language, list_of_events=list_of_events)
 
 #Route for the page of submitting reservation data into the database
 @app.route('/submit_data', methods=['POST'])
@@ -256,7 +267,7 @@ def submit_data():
 
     # Check if any overlapping reservation was found
     if overlapping_reservation:
-        return render_template('recheck_add_data.html', overlapping_reservation=overlapping_reservation, lanes=range(1, num_lanes + 1), translations_selected=translations_selected, name=name, date=convert_to_local_date(date,preferred_language),start_time=start_time,duration=duration,players=players,lanes_selected=lanes_string,kids=kids_playing,specialevent=special_event,preferred_language=preferred_language)
+        return render_template('recheck_add_data.html', overlapping_reservation=overlapping_reservation, lanes=range(1, num_lanes + 1), translations_selected=translations_selected, name=name, date=convert_to_local_date(date,preferred_language),start_time=start_time,duration=duration,players=players,lanes_selected=lanes_string,kids=kids_playing,specialevent=special_event,preferred_language=preferred_language,list_of_events=list_of_events)
     
     # Check for defective lanes
     defective_lanes = DefectiveLane.query.filter_by(is_defective=True).all()
@@ -270,7 +281,7 @@ def submit_data():
     
     #Display the reservation again for changes or confirmation if a discrepancy is found.
     if is_defective_lane or is_non_bumper_lane_with_kids:
-        return render_template('recheck_add_data.html', is_defective_lane=is_defective_lane, no_bumper_lane=is_non_bumper_lane_with_kids, lanes=range(1, num_lanes + 1), translations_selected=translations_selected, name=name, date=request.form.get('date'),start_time=start_time,duration=duration,players=players,lanes_selected=lanes_string,kids=kids_playing,specialevent=special_event, preferred_language=preferred_language)
+        return render_template('recheck_add_data.html', is_defective_lane=is_defective_lane, no_bumper_lane=is_non_bumper_lane_with_kids, lanes=range(1, num_lanes + 1), translations_selected=translations_selected, name=name, date=request.form.get('date'),start_time=start_time,duration=duration,players=players,lanes_selected=lanes_string,kids=kids_playing,specialevent=special_event, preferred_language=preferred_language,list_of_events=list_of_events)
     
     # Save the reservation to the database
     new_reservation = Reservation(
@@ -335,7 +346,7 @@ def update_data():
     #Populate update_data.html with the data from the database
     if reservation:
         date = convert_to_local_date(reservation.date.strftime('%d-%b-%Y'), preferred_language)
-        return render_template('update_data.html', reservation=reservation, lanes=range(1, num_lanes + 1), translations_selected=translations_selected, date=date, preferred_language=preferred_language)
+        return render_template('update_data.html', reservation=reservation, lanes=range(1, num_lanes + 1), translations_selected=translations_selected, date=date, preferred_language=preferred_language,list_of_events=list_of_events)
     else:
         return "Reservation not found", 404
 
@@ -418,7 +429,7 @@ def update_reservation():
 
         # Check if any overlapping reservation was found
         if overlapping_reservation:
-            return render_template('recheck_update_data.html', overlapping_reservation=overlapping_reservation, lanes=range(1, num_lanes + 1), translations_selected=translations_selected, id=reservation_id,name=name, date=request.form.get('date'),start_time=start_time,duration=duration,players=players,lanes_selected=lanes_string,kids=kids_playing,specialevent=special_event, preferred_language=preferred_language)
+            return render_template('recheck_update_data.html', overlapping_reservation=overlapping_reservation, lanes=range(1, num_lanes + 1), translations_selected=translations_selected, id=reservation_id,name=name, date=request.form.get('date'),start_time=start_time,duration=duration,players=players,lanes_selected=lanes_string,kids=kids_playing,specialevent=special_event, preferred_language=preferred_language, list_of_events=list_of_events)
         
         # Check for defective lanes
         defective_lanes = DefectiveLane.query.filter_by(is_defective=True).all()
@@ -432,7 +443,7 @@ def update_reservation():
      
 		#Display the reservation again for changes or confirmation if a discrepancy is found.
         if is_defective_lane or is_non_bumper_lane_with_kids:
-            return render_template('recheck_update_data.html', is_defective_lane=is_defective_lane, no_bumper_lane=is_non_bumper_lane_with_kids, lanes=range(1, num_lanes + 1), translations_selected=translations_selected, id=reservation_id,name=name, date=request.form.get('date'),start_time=start_time,duration=duration,players=players,lanes_selected=lanes_string,kids=kids_playing,specialevent=special_event, preferred_language=preferred_language)
+            return render_template('recheck_update_data.html', is_defective_lane=is_defective_lane, no_bumper_lane=is_non_bumper_lane_with_kids, lanes=range(1, num_lanes + 1), translations_selected=translations_selected, id=reservation_id,name=name, date=request.form.get('date'),start_time=start_time,duration=duration,players=players,lanes_selected=lanes_string,kids=kids_playing,specialevent=special_event, preferred_language=preferred_language, list_of_events=list_of_events)
  
         # Query the database to get the reservation entry
         reservation = Reservation.query.filter_by(id=reservation_id).first()
@@ -509,6 +520,34 @@ def confirm_updating_reservation():
     # Redirect to the schedule page or any other page after successful update
     return redirect(url_for('display_schedule'))
 
+
+#Route for updating the daily comment
+@app.route('/update_dailycomment/<date>', methods=['POST'])
+def update_dailycomment(date=None):
+    #Obtain date and comment
+    requested_date=convert_to_date(date)
+    daily_comment_from_form=request.form.get('dailycomment')
+	
+	# Query the database to get the daily comment entry
+    daily_comment_from_database = DailyComment.query.filter_by(date=requested_date).first()
+	
+    if daily_comment_from_database:
+        #Update date and comment in the database
+        daily_comment_from_database.date = date
+        daily_comment_from_database.dailycomment = daily_comment_from_form
+    else:
+        new_comment = DailyComment(
+        date=date,
+        dailycomment=daily_comment_from_form
+        )
+        db.session.add(new_comment)
+    
+    # Commit the changes to the database
+    db.session.commit()
+ 
+    # Redirect to the schedule page or any other page after successful update
+    return redirect(url_for('display_schedule'))
+    
 #Route for updating an "OK" or "Defective" Lane status in the database
 @app.route('/update_defective_state', methods=['POST'])
 def update_defective_state():

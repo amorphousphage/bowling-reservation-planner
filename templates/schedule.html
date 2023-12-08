@@ -48,6 +48,12 @@
 <form class = "inlineform" action="{{ url_for('add_data') }}">
 	<button class="addupdatereservationbutton">{{ translations_selected.get("Add Reservation") }}</button>
 </form>
+<!-- Daily Comment form -->
+<form class = "inlineform" action="{{ url_for('update_dailycomment', date=requested_date.strftime('%Y-%m-%d')) }}" method="POST">
+	<label class="dailycommenttext" for="dailycomment">{{ translations_selected.get("Daily Comment") }}</label>
+    <textarea class = "dailycomment" id="dailycomment" name="dailycomment" rows="4" cols="40">{% if dailycomment %}{{ dailycomment }}</textarea>{% else %}</textarea>{% endif %}
+    <button class="dailycommentbutton">{{ translations_selected.get("Update Comment") }}</button>
+</form>
 <br><br>
     <table>
         <tr>
