@@ -184,8 +184,10 @@ def display_schedule(date=None):
         
     #Get the daily comment if it exists
     daily_comment_from_database = DailyComment.query.filter_by(date=requested_date).first()
-    dailycomment= daily_comment_from_database.dailycomment
-    #Display the schedule.html with the indicated variables passed to it
+    if daily_comment_from_database:
+        dailycomment= daily_comment_from_database.dailycomment
+    else:
+        dailycomment=None
     return render_template('schedule.html', num_lanes=num_lanes, time_slots=time_slots, time_slots_str=time_slots_str, lane_reservations=lane_reservations, requested_date=requested_date, prev_date=prev_date, next_date=next_date, lane_defective_states=lane_defective_states, translations_selected=translations_selected, translated_day=translated_day, translated_month=translated_month, preferred_language=preferred_language, dailycomment=dailycomment)
 
 #Route for the page of adding a reservation
