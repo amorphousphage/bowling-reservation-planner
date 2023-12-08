@@ -6,17 +6,17 @@
     <title>{{ translations_selected.get("Bowling Lane Schedule") }}</title>
 	<!-- get scripts for datepicker, translation of datepicker and load the styles.css sheet-->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-	
+
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/i18n/jquery-ui-i18n.min.js"></script>
 	<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-	
+
 	<link rel="stylesheet" href="../static/styles.css">
 </head>
 <body>
-	
+
 <h1>{{ translations_selected.get("Bowling Lane Schedule for ") }}{{ translated_day }}, {{ requested_date.strftime('%d. ') }}{{ translated_month }} {{ requested_date.strftime('%Y') }}</h1>
 
 <!-- Previous Date button-->
@@ -37,7 +37,7 @@
 <!-- Calendar Icon and Show Reservations button-->
 <form class="inlineform" action="{{ url_for('display_schedule') }}" method="GET">
     <label for="datepicker" class="calendar-icon">
-        <i class="fas fa-calendar-alt" onclick="$('#datepicker').datepicker('show');"></i>
+        <i class="fas fa-calendar-alt" onclick="$('#date').datepicker('show');"></i>
     </label>
     <input type="text" id="datepicker" name="selected_date">
     <button class="datebuttons">{{ translations_selected.get("Show Reservations") }}</button>
@@ -101,20 +101,7 @@
             </tr>
         {% endfor %}
     </table>
-    
-<script>
-	// function for the datepicker
-	var lang = '{{ preferred_language }}';
-    $(function() {
-		$.datepicker.setDefaults($.datepicker.regional[lang]);
-        $("#datepicker").datepicker({
-            dateFormat: 'yy-mm-dd',
-            changeMonth: true,
-            changeYear: true,
-        });
-    });
-</script>
-    
+
 <script>
     // JavaScript for radio button event listeners for updating to defective state
     const defectiveRadioButtons = document.querySelectorAll('input[value="defective"]');
@@ -197,5 +184,38 @@
     });
   }
 </script>
+
+<!-- Load the language-specific datepicker settings -->
+<script src="/../static/datepicker-languages.js"></script>
+<script>
+    // Load the language-specific datepicker settings based on preferred_language
+    var preferredLanguage = '{{ preferred_language }}'; // Assuming this variable holds the language code
+
+    // Set datepicker settings based on preferred language when the document is ready
+    $(document).ready(function() {
+        switch (preferredLanguage) {
+            case 'de':
+                setGermanDatepicker();
+                break;
+            case 'en':
+                setEnglishDatepicker();
+                break;
+            case 'fr':
+                setFrenchDatepicker();
+                break;
+            case 'it':
+                setItalianDatepicker();
+                break;
+            case 'es':
+                setSpanishDatepicker();
+                break;
+            default:
+                // Default to English settings or any other fallback option
+                setEnglishDatepicker();
+                break;
+        }
+    });
+</script>
+
 </body>
 </html>

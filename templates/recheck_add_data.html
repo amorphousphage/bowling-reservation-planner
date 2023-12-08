@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{ translations_selected.get("Update Bowling Data") }}</title>
+    <title>{{ translations_selected.get("Add Bowling Data") }}</title>
 	<!-- get scripts for date picker and import the styles.css-->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
@@ -10,11 +10,11 @@
     <link rel="stylesheet" href="../static/styles.css">
 </head>
 <body class="update-data">
-    <h1>{{ translations_selected.get("Update Bowling Data") }}</h1>
+    <h1>{{ translations_selected.get("Add Bowling Data") }}</h1>
     <form class="inlineform" method="POST" id="reservationForm">
         <label for="date">{{ translations_selected.get("Date") }}:</label>
         <input type="text" id="date" name="date" value="{{ date }}" required>
-        
+
         <br><br>
 
         <label for="name">{{ translations_selected.get("Name") }}:</label>
@@ -31,7 +31,7 @@
 
         <label for="players">{{ translations_selected.get("Number of Players") }}:</label>
         <input type="number" id="players" name="players" value="{{players}}" ><br><br>
-        
+
 		<label for="kids">{{ translations_selected.get("Kids Playing?") }}</label>
 		<input type="checkbox" id="kids" name="kids" {% if kids == 1 %}checked{% endif %} value="1"><br><br>
 
@@ -42,7 +42,7 @@
 			<label for="lane_{{ lane }}">{{ translations_selected.get("Lane") }} {{ lane }}</label><br>
 		{% endfor %}
 		<br>
-        
+
         <label for="special_event">{{ translations_selected.get("Special Event") }}:</label>
 		<select id="special_event" name="special_event">
 			<option value="No" {% if specialevent == "No" %}selected{% endif %}>No</option>
@@ -52,19 +52,6 @@
 		<button class="addupdatereservationbutton" type="submit">{{ translations_selected.get("Save New Reservation") }}</button>
 		<button class="backbutton" onclick="goBack(event)">{{ translations_selected.get("Back") }}</button>
     </form>
-    
-        <script>
-			// function for the datepicker
-			var lang = '{{ preferred_language }}';
-			$(function() {
-				$.datepicker.setDefaults($.datepicker.regional[lang]);
-				$("#date").datepicker({
-					dateFormat: 'dd-M-yy',
-					changeMonth: true,
-					changeYear: true,
-				});
-			});
-		</script>
         <script>
 	//get translations
 	var translations = {
@@ -75,7 +62,7 @@
 		spontaneousName:  "{{ translations_selected.get('[spontaneous]') }}",
 		NoLaneSelected: "{{ translations_selected.get('Please select at least one lane.') }}",
 		}
-		
+
 	// listener for the type="submit" button to be pushed, which allows for validating the form and first check that at least one lane was selected
 	document.getElementById('reservationForm').addEventListener('submit', function(event) {
     var selectedLanes = document.querySelectorAll('input[name="lanes[]"]:checked');
@@ -97,7 +84,7 @@
 		event.preventDefault();
 		window.location.href = '/';
 		}
-		
+
 	var defectiveconfirmation = false;
 	var bumperconfirmation = false;
     var isDefectiveLane = {{ 'true' if is_defective_lane else 'false' }};
@@ -107,12 +94,12 @@
     function showDefectiveLaneConfirmation() {
         defectiveconfirmation = confirm(translations.defectiveLaneConfirmation);
     }
-    
-    //function for showing and handling the kid on no bumper lane confirmation    
-    function showBumperConfirmation() {    
+
+    //function for showing and handling the kid on no bumper lane confirmation
+    function showBumperConfirmation() {
        bumperconfirmation = confirm(translations.bumperConfirmation);
     }
-    
+
     //function to add the reservation if all necessary confirmations are present
     function CheckConfirmations() {
 		if ((defectiveconfirmation || !isDefectiveLane) && (bumperconfirmation || !noBumperLane)) {
@@ -120,7 +107,7 @@
 			document.getElementById('reservationForm').submit();
 		}
 	}
-	
+
 	//function for showing and handling the error of an overlapping reservation
 	function showOverlapError() {
 		alert(translations.OverlapError);
@@ -139,13 +126,13 @@
     if (Overlap) {
         showOverlapError();
     }
-		
+
 	// listener for the "No Name" button
     document.getElementById('no_name_button').addEventListener('click', function() {
         // Set the name field value to "No Name"
         document.getElementById('name').value = translations.NoName;
     });
-    
+
     // listener for the "spontaneous" button to set the name
     document.getElementById('no_reservation_button').addEventListener('click', function() {
         // Set the name field value to "spontaneous"
@@ -160,6 +147,36 @@
         document.getElementById('start_time').value = roundedTime;
     });
 </script>
-        
+<!-- Load the language-specific datepicker settings -->
+<script src="/../static/datepicker-languages.js"></script>
+<script>
+    // Load the language-specific datepicker settings based on preferred_language
+    var preferredLanguage = '{{ preferred_language }}'; // Assuming this variable holds the language code
+
+    // Set datepicker settings based on preferred language when the document is ready
+    $(document).ready(function() {
+        switch (preferredLanguage) {
+            case 'de':
+                setGermanDatepicker();
+                break;
+            case 'en':
+                setEnglishDatepicker();
+                break;
+            case 'fr':
+                setFrenchDatepicker();
+                break;
+            case 'it':
+                setItalianDatepicker();
+                break;
+            case 'es':
+                setSpanishDatepicker();
+                break;
+            default:
+                // Default to English settings or any other fallback option
+                setEnglishDatepicker();
+                break;
+        }
+    });
+</script>
 </body>
 </html>
