@@ -18,6 +18,7 @@ A flask application for displaying and recording bowling lane reservations for a
 - Update or Delete an existing reservation
 - Mark each lane as "OK" or "Defective"
 - The current timeslot is indicated in red for the reservation planner of the current day
+- To each day a free-text comment can be added. (e.g. "clean lanes today!", "John Doe out of office today.")
 - Translations for the following languages: English, German, French, Italian, Spanish (can be selected in the code)
 - Validation Check (Error Message) if a new/update reservation is overlapping with an existing one
 - Validation Check (Warning Message) if a reservation is booked on a defective lane
