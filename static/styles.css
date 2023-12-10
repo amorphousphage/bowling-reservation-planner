@@ -58,7 +58,17 @@ black 13px
 .inlineform {
 	display: inline-block;
 }
-
+.loginform {
+	font-size:30px;
+	font-weight: bold;
+	margin-top: 10vh;
+    display: grid;
+    place-items: center;
+    min-height: 40vh;
+}
+.loginform input {
+	font-size: 30px;
+}
 .dailycomment {
 	display: inline-block;
 	position: relative;
