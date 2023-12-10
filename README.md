@@ -24,7 +24,7 @@ A flask application for displaying and recording bowling lane reservations for a
 - Validation Check (Warning Message) if a reservation is booked on a defective lane
 - Validation Check (Warning Message) if kids are indicated for a lane, but one of the selected lanes does not have side bumpers installed)
 - HTML integrated validations for required data and start time only starting :00 or :30
-- Reservation plan is secured with a User login
+- Reservation plan is secured with a User login (password should be saved in the browser if desired)
 
 ## status
 The first testing version was hosted on PythonAnywhere, but has not been tested/validated yet.
