@@ -37,7 +37,9 @@ translations_de= {
 	"[spontaneous]":"[spontan]",
 	"Please select at least one lane.":"Es wurde keine Bahn ausgewählt. Bitte mindestens eine Bahn auswählen",
 	"Daily Comment":"Kommentar für heute",
-	"Update Comment":"Kommentar aktualisieren"
+	"Update Comment":"Kommentar aktualisieren",
+	"Username:":"Benutzername:",
+	"Password:":"Passwort:"
 }
 days_de = {
     'Monday': 'Montag',
@@ -101,7 +103,9 @@ translations_en= {
 	"[spontaneous]":"[spontaneous]",
 	"Please select at least one lane.":"No Lane was selected. Please select at least one lane.",
 	"Daily Comment":"Today's comment",
-	"Update Comment":"Update comment"
+	"Update Comment":"Update comment",
+	"Username:":"Username:",
+	"Password:":"Password:"
 }
 
 days_en = {
@@ -166,7 +170,9 @@ translations_it = {
     "[spontaneous]": "[spontaneo]",
     "Please select at least one lane.": "Si prega di selezionare almeno una corsia.",
     "Daily Comment":"Il commento di oggi",
-	"Update Comment":"aggiornare il commento"
+	"Update Comment":"aggiornare il commento",
+	"Username:":"Nome utente:",
+	"Password:":"Password:"
 }
 
 days_it = {
@@ -231,7 +237,9 @@ translations_fr = {
     "[spontaneous]": "[spontané]",
     "Please select at least one lane.": "Veuillez sélectionner au moins une piste.",
     "Daily Comment":"Commentaire du jour",
-	"Update Comment":"mettre à jour le commentaire"
+	"Update Comment":"mettre à jour le commentaire",
+	"Username:":"Nom d'utilisateur:",
+	"Password:":"Mot de passe:"
 }
 
 days_fr = {
@@ -296,7 +304,9 @@ translations_es = {
     "[spontaneous]": "[espontáneo]",
     "Please select at least one lane.": "Por favor, selecciona al menos una pista.",
     "Daily Comment":"Comentario de hoy",
-	"Update Comment":"actualizar comentario"
+	"Update Comment":"actualizar comentario",
+	"Username:":"Nombre de usuario:",
+	"Password:":"Contraseña:"
 }
 
 days_es = {
