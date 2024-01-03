@@ -10,6 +10,8 @@ from translations import *
 app = Flask(__name__, template_folder='templates')  # Set the template folder
 app.secret_key = 'your_secret_key'  # Set a secret key for session security
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://username:password@databaseaddress/databasename'
+app.config['SQLALCHEMY_POOL_RECYCLE'] = 299
+app.config['SQLALCHEMY_POOL_TIMEOUT'] = 20
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
