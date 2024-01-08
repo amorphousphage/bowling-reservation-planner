@@ -420,11 +420,13 @@ def update_reservation():
                         lane_reservations[lane][time_slot] = {
                             'id': reservation.id,
                         }
-                        #Mark the succeeding slots after the start time for a reservation as "occupied"
+                        #Mark the succeeding slots after the start time for a reservation with the reservation.id
                         for j in range(1, res_duration_slots):
-                            lane_reservations[lane][time_slots[i + j]] = 'occupied'
-
-        # Store reservation data of the new reservation in a dictionary for comparison with the one from the database
+                            lane_reservations[lane][time_slots[i + j]] = {
+                                'id':reservation.id,
+                            }
+	
+	# Store reservation data of the new reservation in a dictionary for comparison with the one from the database
         for lane in selected_lanes:
             lane = int(lane) - 1  # Adjust lane index
             for i, time_slot in enumerate(time_slots):
@@ -436,8 +438,9 @@ def update_reservation():
 
                     #Mark the succeeding slots after the start time for a reservation as "occupied"
                     for j in range(1, duration_slots):
-                        updated_reservation[lane][time_slots[i + j]] = 'occupied'
-
+                        updated_reservation[lane][time_slots[i + j]] = {
+                            'id': int(reservation_id),
+                        }
         # Function to check if a new reservation overlaps with existing reservations
         overlapping_reservation= False
         for lane, slots in updated_reservation.items():
