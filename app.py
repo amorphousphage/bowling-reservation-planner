@@ -55,7 +55,7 @@ def select_language(language):
         return translations_en, days_en, months_en
 
 #Set the appriopriate language for the webpage
-preferred_language = "de"
+preferred_language = "en"
 translations_selected, days_selected, months_selected = select_language(preferred_language)
 
 #Define the date converter to convert short format of months to English for storage
