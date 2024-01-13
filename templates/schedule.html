@@ -15,7 +15,7 @@
 
 	<link rel="stylesheet" href="../static/styles.css">
 </head>
-<body>
+<body class="schedule">
 
 <h1>{{ translations_selected.get("Bowling Lane Schedule for ") }}{{ translated_day }}, {{ requested_date.strftime('%d. ') }}{{ translated_month }} {{ requested_date.strftime('%Y') }}</h1>
 
@@ -39,7 +39,7 @@
     <label for="datepicker" class="calendar-icon">
         <i class="fas fa-calendar-alt" onclick="$('#date').datepicker('show');"></i>
     </label>
-    <input type="text" id="datepicker" name="selected_date">
+    <input type="text" readonly id="datepicker" name="selected_date">
     <button class="datebuttons">{{ translations_selected.get("Show Reservations") }}</button>
 </form>
 <br>

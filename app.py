@@ -320,7 +320,7 @@ def submit_data():
     db.session.commit()
 
 	# Re-route to show the schedule after submitting a reservation
-    return redirect(url_for('display_schedule'))
+    return redirect(url_for('display_schedule',date=date))
 
 @app.route('/confirm_adding_reservation', methods=['POST'])
 def confirm_adding_reservation():
@@ -356,7 +356,7 @@ def confirm_adding_reservation():
     db.session.commit()
 
 	# Re-route to show the schedule after submitting a reservation
-    return redirect(url_for('display_schedule'))
+    return redirect(url_for('display_schedule',date=date))
 
 #Route for the page of updating a reservation
 @app.route('/update_data', methods=['GET'])
@@ -486,7 +486,7 @@ def update_reservation():
         db.session.commit()
 
         # Redirect to the schedule page or any other page after successful update
-        return redirect(url_for('display_schedule'))
+        return redirect(url_for('display_schedule',date=date))
 
     #Action if Delete button is pressed
     elif action == 'Delete':
@@ -543,7 +543,7 @@ def confirm_updating_reservation():
     db.session.commit()
 
     # Redirect to the schedule page or any other page after successful update
-    return redirect(url_for('display_schedule'))
+    return redirect(url_for('display_schedule',date=date))
 
 
 #Route for updating the daily comment
@@ -571,7 +571,7 @@ def update_dailycomment(date=None):
     db.session.commit()
 
     # Redirect to the schedule page or any other page after successful update
-    return redirect(url_for('display_schedule'))
+    return redirect(url_for('display_schedule',date=date))
 
 #Route for updating an "OK" or "Defective" Lane status in the database
 @app.route('/update_defective_state', methods=['POST'])

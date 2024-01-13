@@ -13,8 +13,8 @@
     <h1>{{ translations_selected.get("Add Bowling Data") }}</h1>
     <form class="inlineform" method="POST" id="reservationForm">
         <label for="date">{{ translations_selected.get("Date") }}:</label>
-        <input type="text" id="date" name="date" value="{{ today }}" required>
-
+        <input type="text" id="date" name="date" readonly required>
+		<button type="button" class="namebutton" id="today_button">{{ translations_selected.get("Today") }}</button>
         <br><br>
 
         <label for="name">{{ translations_selected.get("Name") }}:</label>
@@ -59,6 +59,10 @@
 		spontaneousName:  "{{ translations_selected.get('[spontaneous]') }}",
 		NoLaneSelected: "{{ translations_selected.get('Please select at least one lane.') }}",
 		}
+		
+	//set today's date
+		var DateToday = "{{ today }}"
+		
 	// listener for the type="submit" button to be pushed, which allows for validating the form and first check that at least one lane was selected
 	document.getElementById('reservationForm').addEventListener('submit', function(event) {
     var selectedLanes = document.querySelectorAll('input[name="lanes[]"]:checked');
@@ -82,6 +86,12 @@
 		window.location.href = '/';
 		}
 
+	// listener for the "Today" button
+    document.getElementById('today_button').addEventListener('click', function() {
+        // Set the date field value to Today's date
+        document.getElementById('date').value = DateToday;
+    });
+    
 	// listener for the "No Name" button
     document.getElementById('no_name_button').addEventListener('click', function() {
         // Set the name field value to "No Name"
@@ -106,7 +116,7 @@
 <script src="/../static/datepicker-languages.js"></script>
 <script>
     // Load the language-specific datepicker settings based on preferred_language
-    var preferredLanguage = '{{ preferred_language }}'; // Assuming this variable holds the language code
+    var preferredLanguage = '{{ preferred_language }}';
 
     // Set datepicker settings based on preferred language when the document is ready
     $(document).ready(function() {

@@ -79,6 +79,11 @@ black 13px
 	font-size: 25px;
 	margin-left:10px;
 }
+
+body.schedule .ui-datepicker {
+	font-size: 40px;
+}
+	
 body {
 	background-image: url("../static/images/bg.png");
 	background-size: cover;

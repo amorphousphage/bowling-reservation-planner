@@ -13,7 +13,7 @@
     <h1>{{ translations_selected.get("Add Bowling Data") }}</h1>
     <form class="inlineform" method="POST" id="reservationForm">
         <label for="date">{{ translations_selected.get("Date") }}:</label>
-        <input type="text" id="date" name="date" value="{{ date }}" required>
+        <input type="text" id="date" name="date" readonly value="{{ date }}" required>
 
         <br><br>
 
@@ -152,8 +152,8 @@
 <script src="/../static/datepicker-languages.js"></script>
 <script>
     // Load the language-specific datepicker settings based on preferred_language
-    var preferredLanguage = '{{ preferred_language }}'; // Assuming this variable holds the language code
-
+    var preferredLanguage = '{{ preferred_language }}';
+    
     // Set datepicker settings based on preferred language when the document is ready
     $(document).ready(function() {
         switch (preferredLanguage) {
