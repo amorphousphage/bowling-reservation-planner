@@ -27,7 +27,7 @@ A flask application for displaying and recording bowling lane reservations for a
 - Reservation plan is secured with a User login (password should be saved in the browser if desired)
 
 ## status
-The first testing version was hosted on PythonAnywhere, but has not been tested/validated yet.
+The first production version was deployed in Fall of 2023 and is running smooth.
 
 ## features to be added in the future
 - Reservation planner for Billards
